@@ -1,0 +1,539 @@
+<!doctype html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Mi cuenta | Zentory</title>
+  <meta name="description" content="Consulta y paga la suscripción de Zentory de tu tienda.">
+  <link rel="icon" href="../../assets/zentory-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0B1220; --bg-2: #0F172A; --surface: #16213A; --surface-2: #1E293B; --line: #263349;
+      --text: #FFFFFF; --text-soft: #CBD5E1; --text-muted: #94A3B8;
+      --green: #10B981; --green-hover: #0EA371; --green-soft: #6EE7B7;
+      --amber: #FCD34D; --amber-bg: rgba(245, 158, 11, .16);
+      --red: #FCA5A5; --red-bg: rgba(239, 68, 68, .16);
+      --blue: #A5B4FC; --blue-bg: rgba(99, 102, 241, .18);
+      color-scheme: dark;
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: "Schibsted Grotesk", system-ui, sans-serif; font-size: 1.0625rem; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    a { color: inherit; }
+    :focus-visible { outline: 3px solid var(--green); outline-offset: 3px; border-radius: 6px; }
+    [hidden] { display: none !important; }
+    .wrap { width: min(760px, 100% - 32px); margin-inline: auto; }
+
+    .top { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 20px; }
+    .top .home { display: flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 700; font-size: 1.2rem; }
+    .top .home img { width: 34px; height: 30px; object-fit: contain; }
+    .who { display: flex; align-items: center; gap: 12px; color: var(--text-muted); font-size: .92rem; }
+    .who button { background: transparent; border: 1px solid var(--line); color: var(--text-soft); border-radius: 8px; padding: 6px 12px; font: inherit; cursor: pointer; }
+    .who button:hover { border-color: var(--text-muted); color: var(--text); }
+
+    h1 { margin: 32px 0 0; font-size: clamp(2.1rem, 6vw, 3rem); line-height: 1.05; letter-spacing: -0.035em; font-weight: 800; }
+    .lead { margin: 12px 0 0; color: var(--text-soft); font-size: 1.12rem; max-width: 52ch; }
+
+    .card { margin-top: 28px; background: var(--bg-2); border: 1px solid var(--line); border-radius: 20px; padding: 28px; }
+    label { display: block; color: var(--text-soft); font-weight: 500; margin: 16px 0 6px; }
+    input { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--text); font: inherit; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 13px 22px; border-radius: 10px; border: 1px solid transparent; font: inherit; font-weight: 600; text-decoration: none; cursor: pointer; background: var(--green); color: #fff; }
+    .btn:hover { background: var(--green-hover); }
+    .btn[disabled] { opacity: .6; cursor: default; }
+    .btn-line { background: transparent; border-color: var(--line); color: var(--text); }
+    .btn-line:hover { background: transparent; border-color: var(--text-muted); }
+    .btn svg { width: 20px; height: 20px; }
+    .full { width: 100%; margin-top: 22px; }
+    .linkbtn { background: none; border: 0; padding: 0; color: var(--green-soft); font: inherit; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+    .msg { margin-top: 14px; min-height: 1.4em; font-size: .95rem; }
+    .msg.error { color: var(--red); }
+    .msg.ok { color: var(--green-soft); }
+    .small { color: var(--text-muted); font-size: .95rem; }
+    .row-between { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 12px; }
+
+    /* Estado de la tienda */
+    .store-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+    .store-head h2 { margin: 0; font-size: 1.6rem; letter-spacing: -0.02em; }
+    .store-head .small { margin-top: 2px; }
+    .pill { display: inline-block; padding: 4px 12px; border-radius: 999px; font-weight: 700; font-size: .88rem; white-space: nowrap; }
+    .s-activa { background: rgba(16, 185, 129, .16); color: var(--green-soft); }
+    .s-por-vencer, .s-gracia { background: var(--amber-bg); color: var(--amber); }
+    .s-suspendida { background: var(--red-bg); color: var(--red); }
+    .s-sin-registro { background: var(--surface-2); color: var(--text-soft); }
+    .s-exenta { background: var(--blue-bg); color: var(--blue); }
+    .facts { margin: 24px 0 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .facts dt { color: var(--text-muted); font-size: .9rem; }
+    .facts dd { margin: 2px 0 0; font-size: 1.35rem; font-weight: 700; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+    .status-note { margin: 20px 0 0; padding: 14px 16px; border-radius: 12px; background: var(--surface); color: var(--text-soft); }
+    .status-note.warn { background: var(--amber-bg); color: var(--amber); }
+    .status-note.bad { background: var(--red-bg); color: var(--red); }
+
+    .card h3 { margin: 0 0 6px; font-size: 1.25rem; letter-spacing: -0.015em; }
+    .methods { display: grid; gap: 12px; margin-top: 16px; }
+    .method { border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; background: var(--surface); }
+    .method h4 { margin: 0 0 8px; font-size: 1.02rem; }
+    .method dl { margin: 0; display: grid; grid-template-columns: auto 1fr auto; gap: 8px 14px; align-items: center; }
+    .method dt { color: var(--text-muted); font-size: .92rem; }
+    .method dd { margin: 0; font-weight: 600; word-break: break-word; }
+    .copy { border: 1px solid var(--line); background: transparent; color: var(--text-soft); border-radius: 8px; padding: 5px 10px; font: inherit; font-size: .85rem; cursor: pointer; }
+
+    .history { list-style: none; margin: 14px 0 0; padding: 0; }
+    .history li { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+    .history li:last-child { border-bottom: 0; }
+    .history .small { display: block; }
+
+    footer { margin-top: 56px; border-top: 1px solid var(--line); }
+    footer .wrap { padding-block: 24px 36px; color: var(--text-muted); font-size: .95rem; }
+    footer a { color: var(--text-soft); }
+    .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--text); color: var(--bg); padding: 10px 16px; border-radius: 10px; font-size: .95rem; font-weight: 600; }
+
+    @media (max-width: 560px) {
+      .facts { grid-template-columns: 1fr 1fr; }
+      .card { padding: 22px 18px; }
+      .method dl { grid-template-columns: 1fr auto; }
+      .method dt { grid-column: 1 / -1; margin-bottom: -6px; }
+    }
+    /* ---- Menú desplegable (computadora y teléfono) ---- */
+    .top { position: relative; }
+    .menu-btn { display: inline-flex; align-items: center; gap: 10px; height: 44px; padding: 0 14px 0 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.05); color: #EEF2FF; font: inherit; font-weight: 600; font-size: .96rem; cursor: pointer; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: border-color .2s ease, background-color .2s ease; }
+    .menu-btn:hover, .menu-btn[aria-expanded="true"] { border-color: rgba(255,255,255,.34); background: rgba(255,255,255,.09); }
+    .menu-btn .bars { display: grid; gap: 4px; }
+    .menu-btn .bars span { display: block; width: 18px; height: 2px; border-radius: 2px; background: currentColor; transition: transform .25s ease, opacity .2s ease; }
+    .menu-btn[aria-expanded="true"] .bars span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .menu-btn[aria-expanded="true"] .bars span:nth-child(2) { opacity: 0; }
+    .menu-btn[aria-expanded="true"] .bars span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+    .top nav#menu { display: none; position: absolute; z-index: 50; top: calc(100% + 6px); right: 0; width: min(330px, calc(100vw - 32px)); flex-direction: column; align-items: stretch; gap: 2px; padding: 8px; border-radius: 18px; border: 1px solid rgba(255,255,255,.12); background: #0C0E1E; box-shadow: 0 30px 70px -20px rgba(0,0,0,.8), 0 0 60px -30px rgba(139,92,246,.7); }
+    .top nav#menu.open { display: flex; animation: menu-in .18s ease; }
+    .top nav#menu a { display: flex !important; align-items: center; gap: 14px; padding: 12px; border-radius: 12px; color: #EEF2FF; text-decoration: none; transition: background-color .15s ease; }
+    .top nav#menu a:hover, .top nav#menu a:focus-visible, .top nav#menu a[aria-current="page"] { background: rgba(255,255,255,.07); }
+    .top nav#menu a > svg { flex: none; width: 38px; height: 38px; padding: 9px; border-radius: 11px; background: linear-gradient(135deg, rgba(34,211,238,.18), rgba(139,92,246,.24)); color: #C7D2FE; }
+    .top nav#menu b { display: block; font-weight: 650; font-size: 1rem; line-height: 1.3; }
+    .top nav#menu small { display: block; color: #AEB8D4; font-size: .86rem; line-height: 1.35; }
+    @keyframes menu-in { from { opacity: 0; transform: translateY(-6px) scale(.98); } }
+    @media (prefers-reduced-motion: reduce) { .top nav#menu.open { animation: none; } }
+    @media (max-width: 640px) {
+      .top nav#menu { left: 0; right: 0; width: auto; }
+      .top nav#menu a { padding: 14px 12px; }
+    }
+    .top .home { margin-right: auto; }
+    .top { gap: 12px; }
+    @media (max-width: 560px) { #who-email { display: none; } }
+    /* =====================================================================
+       Estilo Aurora (igual que nubiksoft.com)
+       ===================================================================== */
+    html:root {
+      --bg: #05070F; --bg-2: rgba(255,255,255,.045); --surface: rgba(255,255,255,.05); --surface-2: rgba(255,255,255,.08); --line: rgba(255,255,255,.1);
+      --text: #EEF2FF; --text-soft: #AEB8D4; --text-muted: #8590AE;
+      --a1: #22D3EE; --a2: #8B5CF6; --a3: #EC4899; --a4: #34D399;
+    }
+    html { background: var(--bg); }
+    body { background: transparent; }
+    :focus-visible { outline-color: #8B9BFF; }
+    .aurora { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; background: var(--bg); }
+    .aurora i { position: absolute; border-radius: 50%; filter: blur(90px); opacity: .42; mix-blend-mode: screen; will-change: transform; }
+    .aurora .b1 { width: 60vw; height: 60vw; left: -15vw; top: -25vw; background: var(--a2); animation: aur1 22s ease-in-out infinite alternate; }
+    .aurora .b2 { width: 50vw; height: 50vw; right: -10vw; top: -10vw; background: var(--a1); animation: aur2 26s ease-in-out infinite alternate; }
+    .aurora .b3 { width: 45vw; height: 45vw; left: 25vw; top: 30vh; background: var(--a3); opacity: .26; animation: aur3 30s ease-in-out infinite alternate; }
+    .aurora .b4 { width: 40vw; height: 40vw; right: 5vw; bottom: -20vw; background: var(--a4); opacity: .22; animation: aur1 34s ease-in-out infinite alternate-reverse; }
+    @keyframes aur1 { to { transform: translate(18vw, 14vh) scale(1.15); } }
+    @keyframes aur2 { to { transform: translate(-16vw, 20vh) scale(.9); } }
+    @keyframes aur3 { to { transform: translate(-12vw, -18vh) scale(1.2); } }
+    .aurora::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 30%, rgba(5,7,15,.75)); }
+    @media (prefers-reduced-motion: reduce) { .aurora i { animation: none; } }
+
+    /* Encabezado de vidrio, igual que el sitio */
+    .top-bar { position: sticky; top: 0; z-index: 60; background: rgba(5,7,15,.5); backdrop-filter: blur(18px) saturate(160%); -webkit-backdrop-filter: blur(18px) saturate(160%); border-bottom: 1px solid var(--line); }
+    .top-bar .top { width: min(1160px, 100% - 32px); padding-block: 14px; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.2rem; letter-spacing: -0.01em; margin-right: auto; }
+    .brand-mark { width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; background: linear-gradient(135deg, var(--a1), var(--a2) 55%, var(--a3)); box-shadow: 0 0 22px rgba(139,92,246,.55); }
+    .brand-mark svg { width: 16px; height: 16px; }
+    .who { color: var(--text-soft); }
+    .who button { height: 44px; padding: 0 14px; border-radius: 12px; border-color: rgba(255,255,255,.16); background: rgba(255,255,255,.05); color: var(--text); font-weight: 600; }
+    .who button:hover { border-color: rgba(255,255,255,.34); }
+
+    main.wrap { padding-top: 8px; }
+    h1 { margin-top: 44px; background: linear-gradient(100deg, #FFFFFF 30%, #C7D2FE 60%, #F5D0FE); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .card { background: var(--bg-2); border-color: var(--line); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 40px 80px -50px rgba(0,0,0,.9); }
+    input { background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.14); }
+    input:focus { border-color: rgba(139,155,255,.7); outline: none; box-shadow: 0 0 0 3px rgba(139,155,255,.2); }
+    .btn { background: linear-gradient(120deg, var(--a1), var(--a2) 55%, var(--a3)); background-size: 180% 100%; color: #fff; box-shadow: 0 10px 30px -10px rgba(139,92,246,.8); transition: background-position .5s ease, box-shadow .3s ease; }
+    .btn:hover { background: linear-gradient(120deg, var(--a1), var(--a2) 55%, var(--a3)); background-size: 180% 100%; background-position: 100% 0; box-shadow: 0 14px 36px -10px rgba(236,72,153,.8); }
+    .btn-line, .btn-line:hover { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.16); box-shadow: none; }
+    .linkbtn { color: #A5B4FC; }
+    .method { background: rgba(255,255,255,.03); }
+    .status-note { background: rgba(255,255,255,.05); }
+    .copy { border-color: rgba(255,255,255,.16); }
+    footer { border-top-color: var(--line); }
+    .toast { background: #1A1F3A; color: var(--text); border: 1px solid rgba(255,255,255,.14); z-index: 70; }
+
+    @media (max-width: 560px) {
+      .top-bar .top { padding-block: 10px; gap: 8px; }
+      .brand { font-size: 1.05rem; gap: 8px; }
+      .brand-mark { width: 30px; height: 30px; }
+      .who button { height: 40px; padding: 0 12px; font-size: .88rem; }
+      .menu-btn { height: 40px; padding: 0 12px; }
+      h1 { margin-top: 28px; font-size: 2.1rem; }
+      .lead { font-size: 1.02rem; }
+      .card { margin-top: 20px; padding: 20px 16px; border-radius: 18px; }
+      .store-head h2 { font-size: 1.35rem; }
+      .facts { gap: 14px 12px; }
+      .facts dd { font-size: 1.15rem; }
+      .row-between .btn { width: 100%; }
+      .row-between { flex-direction: column; align-items: flex-start; }
+      .history li { flex-direction: column; gap: 2px; }
+      footer { margin-top: 40px; }
+    }
+    @media (max-width: 380px) {
+      .brand .name { display: none; }
+      .menu-btn .lbl { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="aurora" aria-hidden="true"><i class="b1"></i><i class="b2"></i><i class="b3"></i><i class="b4"></i></div>
+  <div class="top-bar">
+  <header class="wrap top">
+    <span class="brand"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M2.5 14V2h2.4l6.2 8.4V2h2.4v12h-2.4L4.9 5.6V14z" fill="#fff"/></svg></span><span class="name">NubikSoft</span></span>
+    <div class="who" id="who" hidden><span id="who-email"></span><button type="button" id="logout">Cerrar sesión</button></div>
+      <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Abrir menú"><span class="lbl">Menú</span><span class="bars"><span></span><span></span><span></span></span></button>
+      <nav id="menu" aria-label="Principal">
+        <a href="../../"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span><b>Inicio</b><small>Conoce NubikSoft</small></span></a>
+        <a href="../../proyectos/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg><span><b>Proyectos</b><small>Zentory y Monchi</small></span></a>
+        <a href="./" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span><b>Mi cuenta</b><small>Tu tienda en Zentory</small></span></a>
+        <a href="../../#contacto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg><span><b>Contacto</b><small>Escríbenos por WhatsApp</small></span></a>
+      </nav>
+  </header>
+  </div>
+
+  <main class="wrap">
+    <p class="small" id="loading">Cargando…</p>
+
+    <!-- Inicio de sesión -->
+    <section id="login-view" hidden>
+      <h1>Mi cuenta</h1>
+      <p class="lead">Entra con el mismo correo y contraseña que usas en la app de Zentory para ver y pagar la suscripción de tu tienda.</p>
+      <form class="card" id="login-form" novalidate>
+        <label for="email">Correo</label>
+        <input id="email" type="email" autocomplete="username" required>
+        <label for="password">Contraseña</label>
+        <input id="password" type="password" autocomplete="current-password" required>
+        <button class="btn full" type="submit" id="login-btn">Iniciar sesión</button>
+        <div class="row-between">
+          <button class="linkbtn" type="button" id="forgot">Olvidé mi contraseña</button>
+          <span class="small">¿No tienes cuenta? Créala desde la app de Zentory.</span>
+        </div>
+        <p class="msg" id="login-msg" role="alert"></p>
+      </form>
+    </section>
+
+    <!-- Sesión iniciada -->
+    <section id="account-view" hidden>
+      <h1 id="hello">Mi cuenta</h1>
+
+      <div class="card" id="no-store" hidden>
+        <h3>Tu cuenta no tiene una tienda</h3>
+        <p class="small">Crea tu tienda o únete a una con el código de invitación desde la app de Zentory. Después vuelve a esta página.</p>
+      </div>
+
+      <div class="card" id="pending" hidden>
+        <h3>Tu cuenta espera aprobación</h3>
+        <p class="small">NubikSoft debe aprobar tu cuenta antes de que puedas usar Zentory. Te avisaremos por WhatsApp.</p>
+      </div>
+
+      <div id="store-view" hidden>
+        <div class="card">
+          <div class="store-head">
+            <div><h2 id="store-name"></h2><div class="small" id="store-place"></div></div>
+            <span class="pill" id="store-pill"></span>
+          </div>
+          <dl class="facts">
+            <div><dt>Mensualidad</dt><dd id="fee"></dd></div>
+            <div><dt>Próximo pago</dt><dd id="next"></dd></div>
+            <div><dt>Tu rol</dt><dd id="role"></dd></div>
+          </dl>
+          <p class="status-note" id="status-note"></p>
+        </div>
+
+        <div class="card" id="pay-card" hidden>
+          <h3>Pagar mensualidad</h3>
+          <p class="small" id="pay-intro"></p>
+          <div class="methods" id="methods"></div>
+          <div class="row-between" style="margin-top:18px">
+            <a class="btn" id="pay-wa" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.4.1-.2 0-.3 0-.5l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg>
+              <span id="pay-wa-text"></span>
+            </a>
+          </div>
+        </div>
+
+        <div class="card" id="not-admin" hidden>
+          <h3>Pagos de la tienda</h3>
+          <p class="small">Solo el administrador de la tienda puede pagar la mensualidad. Si eres tú, entra con la cuenta con la que creaste la tienda.</p>
+        </div>
+
+        <div class="card">
+          <h3>Historial de pagos</h3>
+          <ul class="history" id="history"></ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">Zentory es un producto de <a href="../../">NubikSoft</a>, Panamá. ¿Necesitas ayuda? <a href="https://wa.me/50761857395?text=Hola%2C%20necesito%20ayuda%20con%20mi%20cuenta%20de%20Zentory." target="_blank" rel="noopener">Escríbenos por WhatsApp</a>.</div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" hidden></div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+    import {
+      getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, sendPasswordResetEmail,
+    } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+    import {
+      getFirestore, doc, getDoc, getDocs, collection, collectionGroup, query, where, orderBy, limit,
+    } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+    // Firebase (proyecto zentory-base, app web "Panel NubikSoft"): las mismas cuentas de la app.
+    const firebaseConfig = {
+      apiKey: 'AIzaSyC4Ul2Du4OrpHVrpbecSIMqdkZzskpaMAE',
+      authDomain: 'zentory-base.firebaseapp.com',
+      projectId: 'zentory-base',
+      storageBucket: 'zentory-base.firebasestorage.app',
+      messagingSenderId: '794054120945',
+      appId: '1:794054120945:web:0b24be636e6e7088c8a050',
+      measurementId: 'G-7S1THYLZRK',
+    };
+
+    // ---------------------------------------------------------------------
+    // PAGO: mientras no haya pasarela (tarjeta/Yappy automático), el pago es
+    // manual. Llena los datos de cobro que uses; deja '' lo que no uses.
+    // Si no hay ninguno, el botón pide los datos por WhatsApp.
+    // ---------------------------------------------------------------------
+    const PAGO = {
+      montoPorDefecto: 25,
+      whatsapp: '50761857395',
+      yappy: { directorio: '', numero: '' },
+      transferencia: { banco: '', tipo: '', cuenta: '', titular: '' },
+    };
+
+    // Mismas reglas que la app (lib/models/subscription.dart).
+    const GRACE_DAYS = 5;
+    const WARNING_DAYS = 5;
+    const DAY = 864e5;
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const $ = (id) => document.getElementById(id);
+    const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const money = (n) => '$' + Number(n).toFixed(2);
+    const fmtDate = (d) => d ? d.toLocaleDateString('es-PA', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+
+    function show(view) {
+      $('loading').hidden = true;
+      $('login-view').hidden = view !== 'login';
+      $('account-view').hidden = view !== 'account';
+    }
+
+    function statusOf(sub, now = new Date()) {
+      if (!sub) return 'sin-registro';
+      if (sub.estado === 'exenta') return 'exenta';
+      if (sub.estado === 'suspendida') return 'suspendida';
+      const until = sub.pagadoHasta?.toDate?.();
+      if (!until) return 'sin-registro';
+      if (now - until > GRACE_DAYS * DAY) return 'suspendida';
+      if (now > until) return 'gracia';
+      if (until - now <= WARNING_DAYS * DAY) return 'por-vencer';
+      return 'activa';
+    }
+    const LABEL = { 'activa': 'Activa', 'por-vencer': 'Por vencer', 'gracia': 'Vencida (gracia)', 'suspendida': 'Suspendida', 'sin-registro': 'Sin registro', 'exenta': 'Uso sin pago' };
+
+    function friendly(e) {
+      const c = e?.code || '';
+      if (c.includes('invalid-credential') || c.includes('wrong-password') || c.includes('user-not-found') || c.includes('invalid-email')) return 'Correo o contraseña incorrectos.';
+      if (c.includes('too-many-requests')) return 'Demasiados intentos. Espera unos minutos e inténtalo de nuevo.';
+      if (c.includes('network')) return 'Sin conexión. Revisa tu internet e inténtalo de nuevo.';
+      return 'No se pudo completar. Inténtalo de nuevo.';
+    }
+
+    // ---- Inicio de sesión ----
+    $('login-form').addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      const msg = $('login-msg');
+      msg.className = 'msg'; msg.textContent = '';
+      $('login-btn').disabled = true;
+      try {
+        await signInWithEmailAndPassword(auth, $('email').value.trim(), $('password').value);
+      } catch (e) {
+        msg.className = 'msg error'; msg.textContent = friendly(e);
+      } finally {
+        $('login-btn').disabled = false;
+      }
+    });
+
+    $('forgot').addEventListener('click', async () => {
+      const msg = $('login-msg');
+      const email = $('email').value.trim();
+      if (!email) { msg.className = 'msg error'; msg.textContent = 'Escribe tu correo arriba y vuelve a tocar "Olvidé mi contraseña".'; return; }
+      try {
+        await sendPasswordResetEmail(auth, email);
+        msg.className = 'msg ok'; msg.textContent = 'Te enviamos un correo para crear una contraseña nueva. Revisa también la carpeta de spam.';
+      } catch (e) {
+        msg.className = 'msg error'; msg.textContent = friendly(e);
+      }
+    });
+
+    $('logout').addEventListener('click', () => signOut(auth));
+
+    // ---- Buscar la tienda del usuario (misma lógica que la app) ----
+    async function findStoreId(uid, profile) {
+      if (profile?.tiendaId) {
+        const s = await getDoc(doc(db, 'tiendas', profile.tiendaId));
+        if (s.exists()) return s.id;
+      }
+      const asAdmin = await getDocs(query(collection(db, 'tiendas'), where('adminUid', '==', uid), limit(1)));
+      if (!asAdmin.empty) return asAdmin.docs[0].id;
+      const asStaff = await getDocs(query(collectionGroup(db, 'personal'), where('uid', '==', uid), limit(1)));
+      if (!asStaff.empty) return asStaff.docs[0].ref.parent.parent.id;
+      return null;
+    }
+
+    async function isStoreAdmin(storeId, data, uid) {
+      if (data.adminUid) return data.adminUid === uid;
+      const me = await getDocs(query(collection(db, 'tiendas', storeId, 'personal'), where('uid', '==', uid), limit(1)));
+      return !me.empty && me.docs[0].data().rol === 'Administrador';
+    }
+
+    function renderMethods(fee) {
+      const row = (l, v) => v ? `<dt>${l}</dt><dd>${esc(v)}</dd><button class="copy" type="button" data-copy="${esc(v)}">Copiar</button>` : '';
+      const blocks = [];
+      const y = PAGO.yappy, t = PAGO.transferencia;
+      if (y.directorio || y.numero) blocks.push(`<div class="method"><h4>Yappy</h4><dl>${row('Directorio', y.directorio)}${row('Número', y.numero)}${row('Monto', money(fee))}</dl></div>`);
+      if (t.cuenta) blocks.push(`<div class="method"><h4>Transferencia bancaria</h4><dl>${row('Banco', t.banco)}${row('Tipo', t.tipo)}${row('Cuenta', t.cuenta)}${row('Titular', t.titular)}${row('Monto', money(fee))}</dl></div>`);
+      $('methods').innerHTML = blocks.join('');
+      return blocks.length > 0;
+    }
+
+    async function loadHistory(storeId) {
+      const list = $('history');
+      try {
+        const snap = await getDocs(query(collection(db, 'tiendas', storeId, 'pagos'), orderBy('fecha', 'desc'), limit(12)));
+        if (snap.empty) { list.innerHTML = '<li class="small">Todavía no hay pagos registrados.</li>'; return; }
+        list.innerHTML = snap.docs.map((d) => {
+          const p = d.data();
+          const meses = p.meses === 1 ? '1 mes' : `${p.meses || 1} meses`;
+          const monto = typeof p.monto === 'number' ? ` · ${money(p.monto)}` : '';
+          return `<li><div><b>${meses}${monto}</b><span class="small">${esc(p.nota || '')}</span></div>
+            <div class="small" style="text-align:right">${fmtDate(p.fecha?.toDate?.())}<br>hasta ${fmtDate(p.hasta?.toDate?.())}</div></li>`;
+        }).join('');
+      } catch (e) {
+        list.innerHTML = '<li class="small">No se pudo cargar el historial.</li>';
+      }
+    }
+
+    async function loadAccount(user) {
+      $('who').hidden = false;
+      $('who-email').textContent = user.email;
+      for (const id of ['no-store', 'pending', 'store-view']) $(id).hidden = true;
+
+      const profileSnap = await getDoc(doc(db, 'usuarios', user.uid));
+      const profile = profileSnap.exists() ? profileSnap.data() : null;
+      $('hello').textContent = profile?.nombre ? `Hola, ${profile.nombre.split(' ')[0]}` : 'Mi cuenta';
+      show('account');
+
+      if (profile && profile.aprobado === false) { $('pending').hidden = false; return; }
+
+      const storeId = await findStoreId(user.uid, profile);
+      if (!storeId) { $('no-store').hidden = false; return; }
+
+      const storeSnap = await getDoc(doc(db, 'tiendas', storeId));
+      const store = storeSnap.data();
+      const sub = store.suscripcion || null;
+      const status = statusOf(sub);
+      const until = sub?.pagadoHasta?.toDate?.() || null;
+      const fee = typeof sub?.monto === 'number' && sub.monto > 0 ? sub.monto : PAGO.montoPorDefecto;
+      const admin = await isStoreAdmin(storeId, store, user.uid);
+
+      $('store-name').textContent = store.nombre || storeId;
+      $('store-place').textContent = store.ubicacion || '';
+      $('store-pill').className = `pill s-${status}`;
+      $('store-pill').textContent = LABEL[status];
+      $('fee').textContent = status === 'exenta' ? 'Sin cobro' : `${money(fee)}/mes`;
+      $('next').textContent = status === 'exenta' ? '—' : (until ? fmtDate(until) : '—');
+      $('role').textContent = admin ? 'Administrador' : 'Personal';
+
+      const note = $('status-note');
+      note.className = 'status-note';
+      const notes = {
+        'activa': 'Tu tienda está al día.',
+        'por-vencer': `Tu mensualidad vence el ${fmtDate(until)}. Paga antes para evitar interrupciones.`,
+        'gracia': `Tu mensualidad venció el ${fmtDate(until)}. Tienes ${GRACE_DAYS} días de gracia antes de que el inventario quede en solo lectura.`,
+        'suspendida': 'Tu tienda está en solo lectura. Puedes ver tu inventario, pero no agregar ni editar. Al registrarse tu pago vuelve a funcionar al instante; tus datos no se han borrado.',
+        'sin-registro': 'Tu tienda todavía no tiene una suscripción registrada. Sigue funcionando normalmente.',
+        'exenta': 'Tu tienda usa Zentory sin costo. No tienes pagos pendientes.',
+      };
+      note.textContent = notes[status];
+      if (status === 'por-vencer' || status === 'gracia') note.classList.add('warn');
+      if (status === 'suspendida') note.classList.add('bad');
+
+      const canPay = status !== 'exenta';
+      $('pay-card').hidden = !(canPay && admin);
+      $('not-admin').hidden = !(canPay && !admin);
+      if (canPay && admin) {
+        const hasMethods = renderMethods(fee);
+        const name = store.nombre || storeId;
+        $('pay-intro').textContent = hasMethods
+          ? `Paga ${money(fee)} con cualquiera de estas opciones y envíanos el comprobante. Registraremos tu pago y tu tienda quedará al día.`
+          : `Escríbenos y te enviamos los datos para pagar ${money(fee)}.`;
+        $('pay-wa-text').textContent = hasMethods ? 'Enviar comprobante por WhatsApp' : 'Pedir los datos de pago';
+        const text = hasMethods
+          ? `Hola, pagué la mensualidad de Zentory de la tienda ${name} (${money(fee)}). Adjunto el comprobante.`
+          : `Hola, quiero pagar la mensualidad de Zentory de la tienda ${name} (${money(fee)}). ¿Me envían los datos de pago?`;
+        $('pay-wa').href = `https://wa.me/${PAGO.whatsapp}?text=${encodeURIComponent(text)}`;
+      }
+
+      $('store-view').hidden = false;
+      loadHistory(storeId);
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) { $('who').hidden = true; show('login'); return; }
+      try {
+        await loadAccount(user);
+      } catch (e) {
+        show('account');
+        $('hello').textContent = 'Mi cuenta';
+        $('no-store').hidden = false;
+        $('no-store').querySelector('p').textContent = 'No se pudo cargar tu tienda. Revisa tu conexión y recarga la página.';
+      }
+    });
+
+    let timer;
+    document.addEventListener('click', async (ev) => {
+      const btn = ev.target.closest('[data-copy]');
+      if (!btn) return;
+      try { await navigator.clipboard.writeText(btn.dataset.copy); } catch (e) { return; }
+      const el = $('toast');
+      el.textContent = 'Copiado'; el.hidden = false;
+      clearTimeout(timer); timer = setTimeout(() => { el.hidden = true; }, 2000);
+    });
+  </script>
+  <script>
+    // Menú para teléfonos
+    (function () {
+      const btn = document.querySelector('.menu-btn'), nav = document.getElementById('menu');
+      if (!btn || !nav) return;
+      const set = (open) => { nav.classList.toggle('open', open); btn.setAttribute('aria-expanded', String(open)); btn.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú'); };
+      btn.addEventListener('click', () => set(!nav.classList.contains('open')));
+      nav.addEventListener('click', (e) => { if (e.target.closest('a')) set(false); });
+      document.addEventListener('click', (e) => { if (!e.target.closest('.top')) set(false); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { set(false); btn.focus(); } });
+    })();
+  </script>
+</body>
+</html>

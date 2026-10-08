@@ -1,0 +1,623 @@
+<!doctype html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Proyectos | NubikSoft</title>
+  <meta name="description" content="Las aplicaciones de NubikSoft: Zentory, el control de vencimientos para tiendas, y Monchi, el control de gastos personales.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%232446E8%27/%3E%3Cpath d=%27M9 24V8h3.2l7.6 10.6V8H23v16h-3.2L12.2 13.4V24z%27 fill=%27%23fff%27/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --page: #F3F5F8; --surface: #FFFFFF; --ink: #0D1B2A; --ink-soft: #4B5A6B; --ink-faint: #7A8796;
+      --line: #DCE2EA; --cobalt: #2446E8; --cobalt-hover: #1A36C4;
+      color-scheme: light;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) { --page: #0B1622; --surface: #112131; --ink: #EEF2F7; --ink-soft: #A9B6C6; --ink-faint: #7F8EA0; --line: #20344A; --cobalt: #6F88FF; --cobalt-hover: #93A6FF; color-scheme: dark; }
+    }
+    :root[data-theme="dark"] { --page: #0B1622; --surface: #112131; --ink: #EEF2F7; --ink-soft: #A9B6C6; --ink-faint: #7F8EA0; --line: #20344A; --cobalt: #6F88FF; --cobalt-hover: #93A6FF; color-scheme: dark; }
+
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body { margin: 0; overflow-x: clip; background: var(--page); color: var(--ink); font-family: "Schibsted Grotesk", system-ui, sans-serif; font-size: 1.0625rem; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    a { color: inherit; }
+    :focus-visible { outline: 3px solid var(--cobalt); outline-offset: 3px; border-radius: 6px; }
+    .wrap { width: min(1160px, 100% - 32px); margin-inline: auto; }
+    [hidden] { display: none !important; }
+
+    .top-bar { background: var(--page); }
+    .top { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-block: 16px; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 700; font-size: 1.2rem; letter-spacing: -0.01em; }
+    .brand-mark { width: 32px; height: 32px; border-radius: 8px; background: var(--cobalt); display: grid; place-items: center; }
+    .brand-mark svg { width: 16px; height: 16px; }
+    .top nav { display: flex; align-items: center; gap: 28px; font-size: .96rem; font-weight: 500; }
+    .top nav a { text-decoration: none; color: var(--ink-soft); }
+    .top nav a:hover, .top nav a[aria-current="page"] { color: var(--ink); }
+    .top nav .btn { color: #fff; }
+
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 13px 22px; border-radius: 10px; border: 1px solid transparent; font: inherit; font-weight: 600; font-size: 1rem; line-height: 1.2; text-decoration: none; transition: background-color .15s ease, border-color .15s ease; }
+    .btn-primary { background: var(--cobalt); color: #fff; }
+    .btn-primary:hover { background: var(--cobalt-hover); }
+    .btn-small { padding: 9px 16px; font-size: .94rem; }
+    .btn svg { width: 18px; height: 18px; }
+
+    /* ---- Encabezado de la página ---- */
+    .intro { padding-block: 56px 36px; }
+    .intro h1 { margin: 0; font-size: clamp(2.6rem, 5.6vw, 4.2rem); line-height: 1.03; letter-spacing: -0.035em; font-weight: 800; }
+    .intro p { margin: 18px 0 0; max-width: 56ch; color: var(--ink-soft); font-size: 1.18rem; }
+
+    /* ---- Pestañas ---- */
+    .tabs-bar { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--page) 88%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+    .tabs { position: relative; display: flex; gap: 8px; padding-block: 12px; }
+    .tab { display: inline-flex; align-items: center; gap: 10px; padding: 10px 18px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--ink-soft); font: inherit; font-weight: 600; cursor: pointer; text-decoration: none; transition: color .2s ease, border-color .2s ease, background-color .2s ease; }
+    .tab img { width: 24px; height: 24px; object-fit: contain; }
+    .tab:hover { color: var(--ink); }
+    .tab[aria-selected="true"] { color: #fff; border-color: transparent; }
+    .tab[data-app="zentory"][aria-selected="true"] { background: #0F172A; }
+    .tab[data-app="monchi"][aria-selected="true"] { background: #131B2E; }
+
+    /* ---- Panel de cada app ---- */
+    .panel { padding-block: 0 0; }
+    .js .panel.entering { animation: enter .6s cubic-bezier(.2,.7,.2,1); }
+    @keyframes enter { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+
+    .app-hero { padding-block: 64px 72px; }
+    .app-hero .grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 56px; align-items: center; }
+    .app-title { display: flex; align-items: center; gap: 16px; }
+    .app-title img { width: 64px; height: 64px; object-fit: contain; }
+    .app-title h2 { margin: 0; font-size: 2.2rem; letter-spacing: -0.02em; font-weight: 800; }
+    .status { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: .95rem; }
+    .status::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+    .app-hero h3 { margin: 28px 0 0; font-size: clamp(2.2rem, 4.6vw, 3.5rem); line-height: 1.04; letter-spacing: -0.035em; font-weight: 800; max-width: 15ch; }
+    .app-hero .desc { margin: 20px 0 0; max-width: 50ch; font-size: 1.15rem; }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+    .btn-soon { cursor: default; }
+    .hint { margin: 14px 0 0; font-size: .95rem; font-weight: 500; }
+
+    .block { padding-block: 88px; border-top: 1px solid var(--pl); }
+    .block-head { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 64px; align-items: end; margin-bottom: 44px; }
+    .block-head h3 { margin: 0; font-size: clamp(1.8rem, 3.4vw, 2.6rem); line-height: 1.08; letter-spacing: -0.03em; font-weight: 750; }
+    .block-head p { margin: 0; max-width: 54ch; font-size: 1.1rem; }
+
+    .feat { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--pl); border-left: 1px solid var(--pl); }
+    .feat > div { padding: 30px 28px 34px; border-right: 1px solid var(--pl); border-bottom: 1px solid var(--pl); transition: background-color .2s ease; }
+    .feat > div:hover { background: var(--hover); }
+    .feat svg { width: 26px; height: 26px; color: var(--accent); margin-bottom: 16px; }
+    .feat h4 { margin: 0 0 8px; font-size: 1.12rem; font-weight: 700; letter-spacing: -0.01em; }
+    .feat p { margin: 0; }
+
+    .plans { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .plans > div { border: 1px solid var(--pl); border-radius: 20px; padding: 32px; background: var(--card); }
+    .plans > div.hl { border-color: var(--accent); }
+    .plans h4 { margin: 0 0 8px; font-size: 1.35rem; font-weight: 750; letter-spacing: -0.015em; }
+    .plans p { margin: 0; }
+    .plans ul { margin: 18px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+    .plans li { display: flex; gap: 10px; align-items: baseline; }
+    .plans li::before { content: ""; flex: none; width: 6px; height: 6px; border-radius: 2px; background: var(--accent); transform: translateY(-2px); }
+
+    /* Zentory: sus colores */
+    #zentory { --accent: #10B981; --pl: #263349; --card: #0F172A; --hover: #111C33; background: #0B1220; color: #fff; }
+    #zentory .muted, #zentory .desc, #zentory .block-head p, #zentory .feat p, #zentory .plans p { color: #94A3B8; }
+    #zentory .desc { color: #CBD5E1; }
+    #zentory .status { color: #6EE7B7; }
+    #zentory .hint { color: #6EE7B7; }
+    #zentory .btn-soon { border-color: #263349; background: #16213A; color: #CBD5E1; }
+    #zentory .btn-go { background: #10B981; color: #fff; }
+    #zentory .btn-go:hover { background: #0EA371; }
+    #zentory .btn-line { border-color: #263349; color: #fff; }
+    #zentory .btn-line:hover { border-color: #94A3B8; }
+    #zentory .plans ul { color: #CBD5E1; }
+
+    .zphone-col { justify-self: center; display: flex; flex-direction: column; align-items: center; gap: 28px; width: 300px; max-width: 100%; }
+    .zphone-col .webapp { width: 100%; }
+    .zphone { justify-self: center; width: 300px; border-radius: 36px; padding: 10px; background: #050A12; box-shadow: 0 40px 90px -40px rgba(16, 185, 129, .4), 0 0 0 1px #263349; animation: float 7s ease-in-out infinite; }
+    @keyframes float { 50% { transform: translateY(-12px); } }
+    .zphone .screen { border-radius: 28px; background: #0F172A; padding: 20px 16px; font-size: .86rem; line-height: 1.35; }
+    .bar-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .bar-top b { font-size: 1.05rem; }
+    .bar-top small { display: block; color: #94A3B8; font-size: .78rem; }
+    .bar-top img { width: 28px; height: 28px; object-fit: contain; }
+    .lot { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px; border-radius: 12px; background: #1E293B; margin-top: 8px; }
+    .lot b { display: block; font-weight: 600; }
+    .lot span { color: #94A3B8; font-size: .78rem; }
+    .due { flex: none; font-weight: 700; font-size: .74rem; padding: 3px 9px; border-radius: 999px; }
+    .due.red { background: rgba(239, 68, 68, .18); color: #FCA5A5; animation: pulse 2.4s ease-in-out 2s infinite; }
+    @keyframes pulse { 50% { background: rgba(239, 68, 68, .34); } }
+    .due.amber { background: rgba(245, 158, 11, .18); color: #FCD34D; }
+    .due.green { background: rgba(16, 185, 129, .18); color: #6EE7B7; }
+    .scan { margin-top: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: 12px; background: #10B981; font-weight: 700; }
+    .scan svg { width: 16px; height: 16px; }
+
+    .timeline { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); }
+    .timeline::before { content: ""; position: absolute; left: 8px; right: 8px; top: 8px; height: 3px; border-radius: 3px; background: linear-gradient(90deg, #10B981 0 25%, #F59E0B 25% 75%, #EF4444 75%); transform-origin: left; }
+    .js .timeline::before { transform: scaleX(0); transition: transform 1.4s cubic-bezier(.2,.7,.2,1); }
+    .js .timeline.in::before { transform: scaleX(1); }
+    .step { position: relative; padding-top: 32px; padding-right: 24px; }
+    .step::before { content: ""; position: absolute; top: 0; left: 0; width: 19px; height: 19px; border-radius: 50%; background: #0B1220; border: 3px solid var(--dot, #10B981); }
+    .step b { display: block; font-size: 1.05rem; }
+    .step span { color: #94A3B8; font-size: .95rem; }
+    .step.warn { --dot: #F59E0B; } .step.bad { --dot: #EF4444; }
+
+    .start { margin: 0; padding: 0; list-style: none; counter-reset: s; display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+    .start li { counter-increment: s; border-top: 2px solid #10B981; padding-top: 22px; }
+    .start li::before { content: counter(s); display: block; margin-bottom: 14px; font-size: 2.6rem; font-weight: 800; line-height: 1; color: #10B981; letter-spacing: -0.03em; }
+    .start b { display: block; font-size: 1.15rem; margin-bottom: 6px; }
+    .start span { color: #94A3B8; }
+
+    /* Monchi: sus colores */
+    #monchi { --accent: #FFC800; --pl: #E6E4DC; --card: #FFFFFF; --hover: #FFFFFF; background: #FAFAF7; color: #131B2E; }
+    #monchi .desc, #monchi .block-head p, #monchi .feat p, #monchi .plans p { color: #4B5368; }
+    #monchi .status { color: #8A6A00; }
+    #monchi .btn-soon { border-color: #E6E4DC; background: #fff; color: #4B5368; }
+    #monchi .btn-go { background: #FFC800; color: #131B2E; }
+    #monchi .btn-go:hover { background: #E6B400; }
+    #monchi .btn-line { border-color: #E6E4DC; color: #131B2E; background: #fff; }
+    #monchi .btn-line:hover { border-color: #4B5368; }
+    #monchi .feat svg { color: #0F766E; }
+    #monchi .privacy { background: #131B2E; color: #FAFAF7; border-top: 0; }
+    #monchi .privacy .block-head p, #monchi .privacy .feat p { color: #AEB4C4; }
+    #monchi .privacy .feat { --pl: #283250; }
+    #monchi .privacy .feat > div:hover { background: #18213A; }
+    #monchi .privacy .feat svg { color: #FFC800; }
+    #monchi .badge { display: inline-block; margin-left: 8px; padding: 2px 10px; border-radius: 99px; background: #FFC800; color: #131B2E; font-size: .8rem; font-weight: 800; vertical-align: middle; }
+    #monchi .note { margin-top: 18px; color: #4B5368; font-size: .95rem; }
+
+    .mphone { justify-self: center; width: 300px; border-radius: 36px; padding: 10px; background: #0A121C; box-shadow: 0 40px 80px -40px rgba(19, 27, 46, .5); animation: float 7s ease-in-out infinite; }
+    .mphone .screen { border-radius: 28px; background: #FAFAF7; padding: 18px 16px; font-size: .86rem; line-height: 1.35; color: #131B2E; }
+    .balance { background: #131B2E; color: #FAFAF7; border-radius: 18px; padding: 16px; }
+    .balance small { color: #AEB4C4; }
+    .balance strong { display: block; font-size: 1.7rem; letter-spacing: -0.02em; margin-top: 2px; }
+    .balance .row { display: flex; gap: 12px; margin-top: 8px; font-size: .8rem; font-weight: 600; }
+    .balance .in { color: #4ADE80; } .balance .out { color: #FDA58F; }
+    .friend { margin: 12px 0 0; padding: 12px 14px; border-radius: 14px; background: #DDF4F1; color: #0F766E; font-weight: 600; }
+    .budget { margin-top: 14px; }
+    .budget-row { display: flex; justify-content: space-between; font-weight: 600; font-size: .84rem; }
+    .budget-row span:last-child { color: #4B5368; font-weight: 500; }
+    .bar { height: 9px; border-radius: 99px; background: #E6E4DC; margin: 6px 0 12px; overflow: hidden; }
+    .bar i { display: block; height: 100%; border-radius: 99px; background: #14B8A6; width: var(--w); }
+    .bar i.warn { background: #FD7958; }
+    .js .panel.entering .bar i { animation: grow 1.2s cubic-bezier(.2,.7,.2,1) .3s backwards; }
+    @keyframes grow { from { width: 0; } }
+    .plus { margin: 4px auto 0; width: 44px; height: 44px; border-radius: 14px; background: #FFC800; display: grid; place-items: center; font-weight: 800; font-size: 1.5rem; }
+
+    /* Contacto de la página */
+    .cta-band { background: #0D1B2A; color: #F3F5F8; }
+    .cta-band .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 24px; padding-block: 64px; }
+    .cta-band h2 { margin: 0; font-size: clamp(1.8rem, 3.4vw, 2.4rem); letter-spacing: -0.03em; }
+    .cta-band p { margin: 8px 0 0; color: #A9B6C6; }
+    footer { background: #0D1B2A; color: #A9B6C6; }
+    footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding-block: 28px 40px; border-top: 1px solid #22344A; font-size: .95rem; }
+    footer nav { display: flex; gap: 24px; }
+    footer a { color: #A9B6C6; text-decoration: none; }
+    footer a:hover { color: #F3F5F8; }
+
+    /* Aparición al bajar */
+    .js .reveal { opacity: 0; transform: translateY(26px); transition: opacity .8s ease var(--d, 0s), transform .8s cubic-bezier(.2,.7,.2,1) var(--d, 0s); }
+    .js .reveal.in { opacity: 1; transform: none; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      .js .reveal { opacity: 1; transform: none; }
+      .js .timeline::before { transform: none; }
+    }
+    @media (max-width: 900px) {
+      .app-hero .grid, .block-head, .plans, .start { grid-template-columns: 1fr; }
+      .feat { grid-template-columns: 1fr 1fr; }
+      .timeline { grid-template-columns: 1fr 1fr; row-gap: 32px; }
+      .timeline::before { display: none; }
+    }
+    @media (max-width: 560px) {
+      .top nav a:not(.btn):not([aria-current]) { display: none; }
+      .feat, .timeline { grid-template-columns: 1fr; }
+      .block { padding-block: 64px; }
+      .zphone, .mphone { width: 100%; max-width: 300px; }
+      .zphone-col { width: 100%; max-width: 300px; }
+      .tab { padding: 10px 14px; }
+    }
+
+    /* =====================================================================
+       Estilo Aurora + 3D (NubikSoft)
+       ===================================================================== */
+    html:root[data-theme="dark"] {
+      --page: #05070F; --surface: rgba(255,255,255,.045); --ink: #EEF2FF; --ink-soft: #AEB8D4; --ink-faint: #7E89A9;
+      --line: rgba(255,255,255,.09); --cobalt: #8B9BFF; --cobalt-hover: #A9B5FF;
+      --a1: #22D3EE; --a2: #8B5CF6; --a3: #EC4899; --a4: #34D399; color-scheme: dark;
+    }
+    body { background: var(--page); }
+    .aurora { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; background: var(--page); }
+    .aurora i { position: absolute; border-radius: 50%; filter: blur(90px); opacity: .42; mix-blend-mode: screen; will-change: transform; }
+    .aurora .b1 { width: 60vw; height: 60vw; left: -15vw; top: -25vw; background: var(--a2); animation: aur1 22s ease-in-out infinite alternate; }
+    .aurora .b2 { width: 50vw; height: 50vw; right: -10vw; top: -10vw; background: var(--a1); animation: aur2 26s ease-in-out infinite alternate; }
+    .aurora .b3 { width: 45vw; height: 45vw; left: 25vw; top: 30vh; background: var(--a3); opacity: .26; animation: aur3 30s ease-in-out infinite alternate; }
+    .aurora .b4 { width: 40vw; height: 40vw; right: 5vw; bottom: -20vw; background: var(--a4); opacity: .22; animation: aur1 34s ease-in-out infinite alternate-reverse; }
+    @keyframes aur1 { to { transform: translate(18vw, 14vh) scale(1.15); } }
+    @keyframes aur2 { to { transform: translate(-16vw, 20vh) scale(.9); } }
+    @keyframes aur3 { to { transform: translate(-12vw, -18vh) scale(1.2); } }
+    .aurora::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 30%, rgba(5,7,15,.75)); }
+
+    .top-bar { background: rgba(5,7,15,.45); backdrop-filter: blur(18px) saturate(160%); -webkit-backdrop-filter: blur(18px) saturate(160%); border-bottom: 1px solid var(--line); }
+    .brand-mark { background: linear-gradient(135deg, var(--a1), var(--a2) 55%, var(--a3)); box-shadow: 0 0 22px rgba(139,92,246,.55); }
+    .btn-primary, .top nav .btn { background: linear-gradient(120deg, var(--a1), var(--a2) 55%, var(--a3)); background-size: 180% 100%; color: #fff; box-shadow: 0 10px 30px -10px rgba(139,92,246,.8); transition: background-position .5s ease, box-shadow .3s ease; }
+    .btn-primary:hover, .top nav .btn:hover { background-position: 100% 0; box-shadow: 0 14px 36px -10px rgba(236,72,153,.8); }
+
+    /* Encabezado con escena 3D */
+    .intro { display: grid; grid-template-columns: 1.2fr .8fr; gap: 40px; align-items: center; padding-block: 64px 48px; }
+    .intro h1 { background: linear-gradient(100deg, #FFFFFF 30%, #C7D2FE 60%, #F5D0FE); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .scene { position: relative; height: 260px; perspective: 1200px; }
+    .scene .stage { position: absolute; inset: 0; transform-style: preserve-3d; transform: rotateX(var(--rx, 10deg)) rotateY(var(--ry, -18deg)); transition: transform .4s cubic-bezier(.2,.7,.2,1); }
+    .tile { position: absolute; width: 120px; height: 120px; border-radius: 30px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.14); box-shadow: 0 40px 70px -30px rgba(0,0,0,.9), 0 0 50px -16px var(--glow); animation: bob 6s ease-in-out infinite; }
+    .tile img { width: 70%; height: 70%; object-fit: contain; }
+    .tile.tz { --glow: rgba(16,185,129,.7); --z: 90px; left: 8%; top: 70px; background: linear-gradient(150deg, #13233F, #0B1220); }
+    .tile.tm { --glow: rgba(255,200,0,.6); --z: 10px; right: 6%; top: 24px; background: linear-gradient(150deg, #FFFFFF, #F3F1EA); animation-delay: -3s; }
+    @keyframes bob { 0%, 100% { transform: translateZ(var(--z)) translateY(0); } 50% { transform: translateZ(var(--z)) translateY(-12px); } }
+    .cube3d { position: absolute; width: 64px; height: 64px; left: 46%; top: 150px; transform-style: preserve-3d; animation: spin 16s linear infinite; }
+    .cube3d b { position: absolute; inset: 0; border-radius: 8px; border: 1px solid rgba(255,255,255,.4); background: linear-gradient(135deg, rgba(34,211,238,.75), rgba(139,92,246,.75)); box-shadow: inset 0 0 18px rgba(255,255,255,.25); }
+    .cube3d b:nth-child(1) { transform: translateZ(32px); }
+    .cube3d b:nth-child(2) { transform: rotateY(180deg) translateZ(32px); }
+    .cube3d b:nth-child(3) { transform: rotateY(90deg) translateZ(32px); background: linear-gradient(135deg, rgba(139,92,246,.8), rgba(236,72,153,.7)); }
+    .cube3d b:nth-child(4) { transform: rotateY(-90deg) translateZ(32px); background: linear-gradient(135deg, rgba(139,92,246,.8), rgba(236,72,153,.7)); }
+    .cube3d b:nth-child(5) { transform: rotateX(90deg) translateZ(32px); background: linear-gradient(135deg, rgba(52,211,153,.7), rgba(34,211,238,.7)); }
+    .cube3d b:nth-child(6) { transform: rotateX(-90deg) translateZ(32px); }
+    @keyframes spin { from { transform: translateZ(140px) rotateX(-28deg) rotateY(0); } to { transform: translateZ(140px) rotateX(-28deg) rotateY(360deg); } }
+    .orb { position: absolute; border-radius: 50%; width: 40px; height: 40px; right: 30%; bottom: 0; background: radial-gradient(circle at 30% 30%, #fff, var(--a1) 40%, #0E7490); transform: translateZ(150px); box-shadow: 0 0 40px rgba(34,211,238,.6); }
+    .ring { position: absolute; left: 50%; top: 55%; width: 360px; height: 360px; margin: -180px 0 0 -180px; border-radius: 50%; border: 1px solid rgba(139,155,255,.28); transform: rotateX(74deg) translateZ(-40px); box-shadow: 0 0 40px rgba(139,92,246,.25), inset 0 0 40px rgba(34,211,238,.15); }
+
+    /* Pestañas de vidrio */
+    .tabs-bar { background: rgba(5,7,15,.5); backdrop-filter: blur(18px) saturate(160%); -webkit-backdrop-filter: blur(18px) saturate(160%); }
+    .tab { background: rgba(255,255,255,.04); backdrop-filter: blur(10px); }
+    .tab[data-app="zentory"][aria-selected="true"] { background: linear-gradient(135deg, rgba(16,185,129,.35), rgba(15,23,42,.9)); border-color: rgba(16,185,129,.5); box-shadow: 0 10px 30px -12px rgba(16,185,129,.7); }
+    .tab[data-app="monchi"][aria-selected="true"] { background: linear-gradient(135deg, rgba(255,200,0,.3), rgba(19,27,46,.9)); border-color: rgba(255,200,0,.5); box-shadow: 0 10px 30px -12px rgba(255,200,0,.6); }
+
+    /* Paneles: conservan los colores de cada app, con la aurora detrás */
+    #zentory { background: linear-gradient(180deg, rgba(11,18,32,.72), rgba(11,18,32,.92)); --card: rgba(15,23,42,.7); }
+    #zentory .plans > div, #monchi .plans > div { backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); transition: box-shadow .3s ease; }
+    #zentory .plans > div:hover { box-shadow: 0 30px 60px -30px rgba(16,185,129,.55); }
+    #monchi .plans > div:hover { box-shadow: 0 30px 60px -30px rgba(255,200,0,.5); }
+    [data-tilt] { transform-style: preserve-3d; will-change: transform; transition: transform .25s ease, box-shadow .3s ease; }
+
+    .cta-band { background: linear-gradient(120deg, rgba(34,211,238,.12), rgba(139,92,246,.16) 50%, rgba(236,72,153,.12)); border-top: 1px solid var(--line); }
+    footer { background: transparent; }
+    footer .wrap { border-top-color: var(--line); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .aurora i, .cube3d, .tile { animation: none !important; }
+    }
+    @media (max-width: 900px) {
+      .intro { grid-template-columns: 1fr; }
+      .scene { height: 200px; }
+    }
+    @media (max-width: 640px) {
+      .scene .stage { transform: none !important; }
+      .ring, .orb { display: none; }
+      .tile { width: 92px; height: 92px; border-radius: 24px; }
+      .scene { perspective: none; height: 170px; }
+      .tile { animation: none; transform: none; box-shadow: 0 20px 40px -20px rgba(0,0,0,.9), 0 0 30px -10px var(--glow); }
+      .tile.tz { left: 4%; top: 50px; } .tile.tm { top: 10px; }
+      .cube3d { left: 44%; top: 70px; animation-name: spin-m; }
+      @keyframes spin-m { from { transform: rotateX(-28deg) rotateY(0); } to { transform: rotateX(-28deg) rotateY(360deg); } }
+      .aurora i { filter: blur(60px); }
+    }
+    /* ---- Menú desplegable (computadora y teléfono) ---- */
+    .top { position: relative; }
+    .menu-btn { display: inline-flex; align-items: center; gap: 10px; height: 44px; padding: 0 14px 0 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.05); color: #EEF2FF; font: inherit; font-weight: 600; font-size: .96rem; cursor: pointer; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: border-color .2s ease, background-color .2s ease; }
+    .menu-btn:hover, .menu-btn[aria-expanded="true"] { border-color: rgba(255,255,255,.34); background: rgba(255,255,255,.09); }
+    .menu-btn .bars { display: grid; gap: 4px; }
+    .menu-btn .bars span { display: block; width: 18px; height: 2px; border-radius: 2px; background: currentColor; transition: transform .25s ease, opacity .2s ease; }
+    .menu-btn[aria-expanded="true"] .bars span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .menu-btn[aria-expanded="true"] .bars span:nth-child(2) { opacity: 0; }
+    .menu-btn[aria-expanded="true"] .bars span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+    .top nav#menu { display: none; position: absolute; z-index: 50; top: calc(100% + 6px); right: 0; width: min(330px, calc(100vw - 32px)); flex-direction: column; align-items: stretch; gap: 2px; padding: 8px; border-radius: 18px; border: 1px solid rgba(255,255,255,.12); background: #0C0E1E; box-shadow: 0 30px 70px -20px rgba(0,0,0,.8), 0 0 60px -30px rgba(139,92,246,.7); }
+    .top nav#menu.open { display: flex; animation: menu-in .18s ease; }
+    .top nav#menu a { display: flex !important; align-items: center; gap: 14px; padding: 12px; border-radius: 12px; color: #EEF2FF; text-decoration: none; transition: background-color .15s ease; }
+    .top nav#menu a:hover, .top nav#menu a:focus-visible, .top nav#menu a[aria-current="page"] { background: rgba(255,255,255,.07); }
+    .top nav#menu a > svg { flex: none; width: 38px; height: 38px; padding: 9px; border-radius: 11px; background: linear-gradient(135deg, rgba(34,211,238,.18), rgba(139,92,246,.24)); color: #C7D2FE; }
+    .top nav#menu b { display: block; font-weight: 650; font-size: 1rem; line-height: 1.3; }
+    .top nav#menu small { display: block; color: #AEB8D4; font-size: .86rem; line-height: 1.35; }
+    @keyframes menu-in { from { opacity: 0; transform: translateY(-6px) scale(.98); } }
+    @media (prefers-reduced-motion: reduce) { .top nav#menu.open { animation: none; } }
+    @media (max-width: 640px) {
+      .top nav#menu { left: 0; right: 0; width: auto; }
+      .top nav#menu a { padding: 14px 12px; }
+    }
+    @media (max-width: 560px) { .actions { flex-direction: column; align-items: stretch; } .actions .btn { width: 100%; text-align: center; } }
+    /* El menú siempre por encima de la escena 3D */
+    .top-bar { position: relative; z-index: 60; }
+  </style>
+  <script>document.documentElement.classList.add('js');</script>
+</head>
+<body>
+  <div class="aurora" aria-hidden="true"><i class="b1"></i><i class="b2"></i><i class="b3"></i><i class="b4"></i></div>
+  <div class="top-bar">
+    <header class="wrap top">
+      <a class="brand" href="../">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M2.5 14V2h2.4l6.2 8.4V2h2.4v12h-2.4L4.9 5.6V14z" fill="#fff"/></svg></span>
+        NubikSoft
+      </a>
+      <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Abrir menú"><span class="lbl">Menú</span><span class="bars"><span></span><span></span><span></span></span></button>
+      <nav id="menu" aria-label="Principal">
+        <a href="../"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span><b>Inicio</b><small>Conoce NubikSoft</small></span></a>
+        <a href="../proyectos/" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg><span><b>Proyectos</b><small>Zentory y Monchi</small></span></a>
+        <a href="../zentory/cuenta/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span><b>Mi cuenta</b><small>Tu tienda en Zentory</small></span></a>
+        <a href="../#contacto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg><span><b>Contacto</b><small>Escríbenos por WhatsApp</small></span></a>
+      </nav>
+    </header>
+  </div>
+
+  <main>
+    <div class="wrap intro">
+      <div>
+        <h1>Nuestros proyectos</h1>
+        <p>Aplicaciones propias de NubikSoft, cada una pensada para resolver un problema concreto. Elige una para ver toda su información.</p>
+      </div>
+      <div class="scene" aria-hidden="true">
+        <div class="stage" id="stage">
+          <div class="ring"></div>
+          <div class="tile tm"><img src="../assets/monchi-icon.png" alt=""></div>
+          <div class="cube3d"><b></b><b></b><b></b><b></b><b></b><b></b></div>
+          <div class="tile tz"><img src="../assets/zentory-icon.png" alt=""></div>
+          <span class="orb"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabs-bar">
+      <div class="wrap tabs" role="tablist" aria-label="Aplicaciones">
+        <a class="tab" role="tab" id="tab-zentory" data-app="zentory" href="#zentory" aria-controls="zentory" aria-selected="true"><img src="../assets/zentory-icon.png" alt="">Zentory</a>
+        <a class="tab" role="tab" id="tab-monchi" data-app="monchi" href="#monchi" aria-controls="monchi" aria-selected="false"><img src="../assets/monchi-icon.png" alt="">Monchi</a>
+      </div>
+    </div>
+
+    <!-- ===================== ZENTORY ===================== -->
+    <div class="panel" id="zentory" role="tabpanel" aria-labelledby="tab-zentory">
+      <div class="wrap app-hero">
+        <div class="grid">
+          <div>
+            <div class="app-title">
+              <img src="../assets/zentory-icon.png" alt="Logo de Zentory">
+              <div><h2>Zentory</h2><span class="status">Disponible</span></div>
+            </div>
+            <h3>Que ningún producto se te venza en el estante.</h3>
+            <p class="desc">Zentory registra los lotes de cada producto con su fecha de vencimiento y te avisa con tiempo, para que lo vendas, lo pongas en oferta o lo retires antes de perderlo.</p>
+            <div class="actions">
+              <span class="btn btn-soon" aria-disabled="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 2.8v18.4c0 .4.4.6.7.4l10-9.2a.5.5 0 0 0 0-.8L4.7 2.4c-.3-.2-.7 0-.7.4zM16.3 9.6l-2.5 2.3 2.5 2.4 3.2-1.8c.6-.3.6-1.1 0-1.4zM5.8 22.2l9-8.2 1.8 1.7-10.4 6.7zM5.8 1.8l10.8 6.5-1.8 1.7z"/></svg>Próximamente en Google Play</span>
+              <a class="btn btn-go" href="https://wa.me/50761857395?text=Hola%2C%20quiero%20conocer%20los%20precios%20de%20Zentory." target="_blank" rel="noopener">Consultar precios por WhatsApp</a>
+            </div>
+            <p class="hint">Las tiendas nuevas tienen su primer mes gratis.</p>
+          </div>
+          <div class="zphone-col">
+            <div class="zphone" role="img" aria-label="Ejemplo de la lista de productos por vencer en Zentory">
+              <div class="screen">
+                <div class="bar-top"><div><b>Por vencer</b><small>Esta semana</small></div><img src="../assets/zentory-icon.png" alt=""></div>
+                <div class="lot"><div><b>Leche entera 1 L</b><span>12 unidades</span></div><span class="due red">Hoy</span></div>
+                <div class="lot"><div><b>Yogur de fresa</b><span>8 unidades</span></div><span class="due amber">Mañana</span></div>
+                <div class="lot"><div><b>Pan de molde</b><span>15 unidades</span></div><span class="due amber">En 3 días</span></div>
+                <div class="lot"><div><b>Queso blanco 500 g</b><span>6 unidades</span></div><span class="due green">En 9 días</span></div>
+                <div class="scan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M8 8v8M12 8v8M16 8v8"/></svg>Escanear producto</div>
+              </div>
+            </div>
+            <a class="btn btn-go webapp" href="../zentory/app/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.7 5.6 3.7 9s-1.2 6.4-3.7 9c-2.5-2.6-3.7-5.6-3.7-9S9.5 5.6 12 3z"/></svg>Usar la app web</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="wrap">
+          <div class="block-head reveal"><h3>Así te avisa de cada lote</h3><p>Las alertas llegan a las 7:00 a. m. al teléfono de todo el personal, aunque la app esté cerrada.</p></div>
+          <div class="timeline reveal" aria-label="Avisos de un lote antes de vencer">
+            <div class="step"><b>Registras el lote</b><span>Escaneas el código, pones la fecha y la cantidad.</span></div>
+            <div class="step warn"><b>3 días antes</b><span>Primera alerta en el teléfono de todo el personal.</span></div>
+            <div class="step warn"><b>1 día antes</b><span>Segundo aviso para actuar a tiempo.</span></div>
+            <div class="step bad"><b>El día que vence</b><span>Último aviso; a los 3 días el lote se borra solo.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="wrap">
+          <div class="block-head reveal"><h3>Lo que hace Zentory</h3><p>Pensada para el ritmo de un minisúper: registrar un lote toma segundos.</p></div>
+          <div class="feat">
+            <div class="reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M8 8v8M12 8v8M16 8v8"/></svg><h4>Escáner de códigos</h4><p>Cada producto se identifica por su código de barras. Escanéalo otra vez y vas directo a registrar un lote nuevo.</p></div>
+            <div class="reveal" style="--d:.08s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0-6 6c0 6-3 7-3 7h18s-3-1-3-7a6 6 0 0 0-6-6M10 20a2 2 0 0 0 4 0"/></svg><h4>Alertas de vencimiento</h4><p>Avisos a las 7:00 a. m. tres días antes, un día antes y el mismo día, aunque la app esté cerrada.</p></div>
+            <div class="reveal" style="--d:.16s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg><h4>Lotes por producto</h4><p>Un mismo producto puede tener varios lotes con fechas y cantidades distintas. Coca-Cola de 600 ml y de 2 L son productos separados.</p></div>
+            <div class="reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg><h4>Todo tu personal</h4><p>Comparte el código de invitación de la tienda y cada trabajador entra con su propia cuenta al mismo inventario.</p></div>
+            <div class="reveal" style="--d:.08s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><h4>Calendario</h4><p>Mira qué lotes vencen cada día del mes y planifica ofertas con anticipación.</p></div>
+            <div class="reveal" style="--d:.16s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg><h4>Español, inglés y chino</h4><p>Cada persona elige su idioma y el modo claro u oscuro desde Ajustes.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="wrap">
+          <div class="block-head reveal"><h3>Empezar toma unos minutos</h3></div>
+          <ol class="start">
+            <li class="reveal"><b>Descarga la app</b><span>Instala Zentory desde Google Play en el teléfono Android de la tienda y crea tu cuenta.</span></li>
+            <li class="reveal" style="--d:.12s"><b>Crea tu tienda</b><span>Pon el nombre y la ubicación. Comparte el código de invitación con tu personal.</span></li>
+            <li class="reveal" style="--d:.24s"><b>Registra tus productos</b><span>Escanea cada código de barras y agrega sus lotes con fecha y cantidad.</span></li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="wrap">
+          <div class="block-head reveal"><h3>Planes</h3><p>Sin pago inicial: solo una mensualidad por tienda, que cubre el servidor, las actualizaciones y el soporte.</p></div>
+          <div class="plans" data-tiltgroup>
+            <div class="hl reveal"><h4>Primer mes gratis</h4><p>Instala Zentory y úsala un mes completo sin pagar. La primera mensualidad se paga al terminar el segundo mes.</p></div>
+            <div class="reveal" style="--d:.12s"><h4>Mensualidad</h4><p>Se paga al final de cada mes de uso. Mientras esté al día, tu tienda funciona sin límites.</p>
+              <ul><li>Recordatorio por WhatsApp antes de cada vencimiento.</li><li>Si se atrasa, tu inventario se conserva y puedes seguir consultándolo.</li></ul></div>
+          </div>
+          <div class="actions reveal">
+            <a class="btn btn-go" href="https://wa.me/50761857395?text=Hola%2C%20quiero%20conocer%20los%20precios%20de%20Zentory." target="_blank" rel="noopener">Consultar precios por WhatsApp</a>
+            <a class="btn btn-line" href="../zentory/cuenta/">Ya tengo tienda: pagar mi mensualidad</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== MONCHI ===================== -->
+    <div class="panel" id="monchi" role="tabpanel" aria-labelledby="tab-monchi">
+      <div class="wrap app-hero">
+        <div class="grid">
+          <div>
+            <div class="app-title">
+              <img src="../assets/monchi-icon.png" alt="Logo de Monchi">
+              <div><h2>Monchi</h2><span class="status">Próximamente en Google Play</span></div>
+            </div>
+            <h3>Tu dinero, claro y solo tuyo.</h3>
+            <p class="desc">Monchi te ayuda a llevar tus gastos, tus presupuestos y tus metas de ahorro sin complicarte. Funciona sin conexión, sin cuenta y sin anuncios, como ese amigo ordenado que nunca te juzga.</p>
+            <div class="actions">
+              <span class="btn btn-soon" aria-disabled="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 2.8v18.4c0 .4.4.6.7.4l10-9.2a.5.5 0 0 0 0-.8L4.7 2.4c-.3-.2-.7 0-.7.4zM16.3 9.6l-2.5 2.3 2.5 2.4 3.2-1.8c.6-.3.6-1.1 0-1.4zM5.8 22.2l9-8.2 1.8 1.7-10.4 6.7zM5.8 1.8l10.8 6.5-1.8 1.7z"/></svg>Próximamente en Google Play</span>
+              <a class="btn btn-go" href="https://wa.me/50767968449?text=Hola%2C%20tengo%20una%20consulta%20sobre%20Monchi." target="_blank" rel="noopener">Consultas por WhatsApp</a>
+            </div>
+          </div>
+          <div class="mphone" role="img" aria-label="Ejemplo de la pantalla de inicio de Monchi">
+            <div class="screen">
+              <div class="bar-top"><b>Inicio</b><img src="../assets/monchi-icon.png" alt=""></div>
+              <div class="balance"><small>Disponible este mes</small><strong>$412.50</strong><div class="row"><span class="in">+ $1,200.00</span><span class="out">− $787.50</span></div></div>
+              <p class="friend">Este mes vas mejor que el pasado.</p>
+              <div class="budget">
+                <div class="budget-row"><span>Comida</span><span>62%</span></div><div class="bar"><i style="--w:62%"></i></div>
+                <div class="budget-row"><span>Transporte</span><span>84%</span></div><div class="bar"><i class="warn" style="--w:84%"></i></div>
+                <div class="budget-row"><span>Suscripciones</span><span>40%</span></div><div class="bar"><i style="--w:40%"></i></div>
+              </div>
+              <div class="plus">+</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="block privacy">
+        <div class="wrap">
+          <div class="block-head reveal"><h3>Tus datos no salen de tu teléfono</h3><p>Monchi no tiene servidores que guarden tu información, ni analíticas, ni anuncios. Todo lo que registras queda cifrado en tu teléfono.</p></div>
+          <div class="feat">
+            <div class="reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><h4>PIN y huella</h4><p>Bloquea la app con PIN, huella o Face ID. Se vuelve a bloquear sola a los 30 segundos.</p></div>
+            <div class="reveal" style="--d:.08s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><path d="M4 4l16 16"/></svg><h4>Pantalla protegida</h4><p>Tus saldos no se ven cuando cambias de app.</p></div>
+            <div class="reveal" style="--d:.16s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><h4>Avisos discretos</h4><p>Las notificaciones nunca muestran montos.</p></div>
+            <div class="reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg><h4>Respaldos cifrados</h4><p>Exporta tus datos protegidos con contraseña y cifrado AES-256.</p></div>
+            <div class="reveal" style="--d:.08s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg><h4>Restauración segura</h4><p>Antes de restaurar, Monchi revisa el archivo y guarda una copia de lo que tienes.</p></div>
+            <div class="reveal" style="--d:.16s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M15 9.5c0-1.4-1.3-2-3-2s-3 .8-3 2 1.3 1.8 3 2.1 3 .9 3 2.2-1.3 2.2-3 2.2-3-.7-3-2"/></svg><h4>Cuentas exactas</h4><p>Cada monto se guarda al centavo, sin redondeos.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="wrap">
+          <div class="block-head reveal"><h3>Todo para ordenar tu dinero</h3><p>Registra un gasto en segundos con el botón amarillo y deja que Monchi haga las cuentas.</p></div>
+          <div class="feat">
+            <div class="reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10M7 12h10M7 17h6"/><rect x="3" y="3" width="18" height="18" rx="3"/></svg><h4>Movimientos</h4><p>Gastos e ingresos con búsqueda, filtros y la opción de deshacer.</p></div>
+            <div class="reveal" style="--d:.08s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12A9 9 0 1 1 12 3v9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/></svg><h4>Presupuestos</h4><p>Un presupuesto mensual general y otro por categoría, con su historial.</p></div>
+            <div class="reveal" style="--d:.16s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></svg><h4>Suscripciones</h4><p>Pagos recurrentes con su costo mensual y anual, que se registran solos.</p></div>
+            <div class="reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><h4>Metas de ahorro</h4><p>Depósitos y retiros, con una sugerencia de cuánto ahorrar cada mes.</p></div>
+            <div class="reveal" style="--d:.08s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><h4>Estadísticas</h4><p>Compara con el mes anterior, mira en qué categoría gastas más y revisa tu año.</p></div>
+            <div class="reveal" style="--d:.16s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><h4>Recordatorios</h4><p>Avisos de pago y alertas cuando llegas al 80% de un presupuesto.</p></div>
+            <div class="reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2z"/><path d="M9 7h6M9 11h6M9 15h3"/></svg><h4>Escanea recibos</h4><p>Lee tus recibos con la cámara, directamente en el teléfono.</p></div>
+            <div class="reveal" style="--d:.08s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M5 21V10M19 21V10M9 21v-7M15 21v-7M2 10l10-7 10 7z"/></svg><h4>Importa tu banco</h4><p>Trae tus movimientos desde el estado de cuenta en CSV.</p></div>
+            <div class="reveal" style="--d:.16s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 1-13.3 7.9L3 21l1.1-4.7A9 9 0 1 1 21 12z"/><path d="M8 12h.01M12 12h.01M16 12h.01"/></svg><h4>Asistente</h4><p>Un asistente financiero que te orienta, en español e inglés.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="wrap">
+          <div class="block-head reveal"><h3>Gratis, y Premium si quieres más</h3><p>Monchi no tiene anuncios en ningún plan.</p></div>
+          <div class="plans" data-tiltgroup>
+            <div class="reveal"><h4>Gratis</h4><p>Lo esencial para llevar tus cuentas.</p>
+              <ul><li>Movimientos ilimitados</li><li>Presupuesto mensual y 2 por categoría</li><li>1 meta de ahorro y 3 suscripciones</li><li>5 categorías propias</li><li>Estadísticas del año actual</li><li>Recordatorios, PIN y respaldo manual</li></ul></div>
+            <div class="hl reveal" style="--d:.12s"><h4>Premium <span class="badge">Todo ilimitado</span></h4><p>Todo lo del plan gratis, y además:</p>
+              <ul><li>Presupuestos, metas y suscripciones sin límite</li><li>Estadísticas por categoría e historial anual</li><li>Escaneo de recibos e importación del banco</li><li>Asistente financiero</li><li>Respaldos automáticos y exportación cifrada o CSV</li></ul></div>
+          </div>
+          <p class="note reveal">Los precios de Premium estarán en Google Play cuando Monchi esté disponible.</p>
+          <div class="actions reveal">
+            <a class="btn btn-go" href="https://wa.me/50767968449?text=Hola%2C%20tengo%20una%20consulta%20sobre%20Monchi." target="_blank" rel="noopener">Consultas por WhatsApp</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta-band">
+      <div class="wrap">
+        <div>
+          <h2>¿Tienes un proyecto en mente?</h2>
+          <p>Cuéntanos qué necesitas resolver y te ayudamos a construirlo.</p>
+        </div>
+        <a class="btn btn-primary" href="../#contacto">Ver contactos</a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span>© <span id="year">2026</span> NubikSoft, Panamá</span>
+      <nav aria-label="Pie de página"><a href="../">Inicio</a><a href="../zentory/cuenta/">Mi cuenta</a><a href="../#contacto">Contacto</a></nav>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Aparición de cada bloque al llegar a él
+    const io = 'IntersectionObserver' in window ? new IntersectionObserver((entries) => {
+      for (const e of entries) if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }) : null;
+    const watch = (root) => root.querySelectorAll('.reveal:not(.in)').forEach((el) => io ? io.observe(el) : el.classList.add('in'));
+
+    // Pestañas: Zentory y Monchi (también responden a #zentory y #monchi en la dirección)
+    const tabs = [...document.querySelectorAll('.tab')];
+    const panels = { zentory: document.getElementById('zentory'), monchi: document.getElementById('monchi') };
+    function show(app, animate) {
+      if (!panels[app]) app = 'zentory';
+      for (const t of tabs) t.setAttribute('aria-selected', String(t.dataset.app === app));
+      for (const [name, el] of Object.entries(panels)) {
+        el.hidden = name !== app;
+        el.classList.remove('entering');
+      }
+      if (animate) { void panels[app].offsetWidth; panels[app].classList.add('entering'); }
+      watch(panels[app]);
+    }
+    for (const t of tabs) {
+      t.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        history.replaceState(null, '', '#' + t.dataset.app);
+        show(t.dataset.app, true);
+        const bar = document.querySelector('.tabs-bar');
+        if (bar.getBoundingClientRect().top < 0 || window.scrollY > bar.offsetTop) window.scrollTo({ top: bar.offsetTop, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+      });
+    }
+    window.addEventListener('hashchange', () => show(location.hash.slice(1), true));
+    show(location.hash.slice(1), false);
+
+    // 3D: la escena y las tarjetas de planes siguen al mouse
+    if (matchMedia('(pointer: fine)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const stage = document.getElementById('stage');
+      window.addEventListener('pointermove', (e) => {
+        const x = e.clientX / innerWidth - .5, y = e.clientY / innerHeight - .5;
+        stage.style.setProperty('--ry', (-18 + x * 22).toFixed(2) + 'deg');
+        stage.style.setProperty('--rx', (10 - y * 14).toFixed(2) + 'deg');
+      }, { passive: true });
+      document.querySelectorAll('[data-tiltgroup] > div').forEach((el) => {
+        el.setAttribute('data-tilt', '');
+        el.addEventListener('pointermove', (e) => {
+          const r = el.getBoundingClientRect();
+          const x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+          el.style.transform = `perspective(900px) rotateY(${(x * 8).toFixed(2)}deg) rotateX(${(-y * 8).toFixed(2)}deg) translateZ(6px)`;
+        });
+        el.addEventListener('pointerleave', () => { el.style.transform = ''; });
+      });
+    }
+  </script>
+  <script>
+    // Menú para teléfonos
+    (function () {
+      const btn = document.querySelector('.menu-btn'), nav = document.getElementById('menu');
+      if (!btn || !nav) return;
+      const set = (open) => { nav.classList.toggle('open', open); btn.setAttribute('aria-expanded', String(open)); btn.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú'); };
+      btn.addEventListener('click', () => set(!nav.classList.contains('open')));
+      nav.addEventListener('click', (e) => { if (e.target.closest('a')) set(false); });
+      document.addEventListener('click', (e) => { if (!e.target.closest('.top')) set(false); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { set(false); btn.focus(); } });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1560 @@
+<!doctype html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Zentory Admin</title>
+  <link rel="icon" href="../../assets/zentory-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F4F6F9;
+      --panel: #FFFFFF;
+      --ink: #111827;
+      --ink-soft: #4B5563;
+      --muted: #6B7280;
+      --line: #E1E5EB;
+      --brand: #0F172A;
+      --green: #0E9F6E;
+      --green-bg: #DEF7EC;
+      --amber: #B45309;
+      --amber-bg: #FEF3C7;
+      --red: #C81E1E;
+      --red-bg: #FDE8E8;
+      --gray-bg: #EEF0F3;
+      --blue: #1E40AF;
+      --blue-bg: #E0E7FF;
+      --focus: #2F4BFF;
+      color-scheme: light;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #0F172A; --panel: #172033; --ink: #F1F5F9; --ink-soft: #CBD5E1;
+        --muted: #94A3B8; --line: #2A3650; --brand: #020617;
+        --green: #34D399; --green-bg: #0B3B2E; --amber: #FBBF24; --amber-bg: #3D2E0A;
+        --red: #F87171; --red-bg: #43191B; --gray-bg: #222C40; --focus: #8FA0FF;
+        --blue: #A5B4FC; --blue-bg: #1E2A5A;
+        color-scheme: dark;
+      }
+    }
+    :root[data-theme="dark"] {
+      --bg: #0F172A; --panel: #172033; --ink: #F1F5F9; --ink-soft: #CBD5E1;
+      --muted: #94A3B8; --line: #2A3650; --brand: #020617;
+      --green: #34D399; --green-bg: #0B3B2E; --amber: #FBBF24; --amber-bg: #3D2E0A;
+      --red: #F87171; --red-bg: #43191B; --gray-bg: #222C40; --focus: #8FA0FF;
+      --blue: #A5B4FC; --blue-bg: #1E2A5A;
+      color-scheme: dark;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--ink);
+      font-family: "Schibsted Grotesk", system-ui, sans-serif; font-size: 15px; line-height: 1.5;
+    }
+    :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
+    button, input, select { font: inherit; color: inherit; }
+    [hidden] { display: none !important; }
+
+    header.bar {
+      background: var(--brand); color: #fff;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 12px 20px;
+    }
+    header.bar .id { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+    header.bar img { width: 30px; height: 26px; object-fit: contain; }
+    header.bar .who { font-size: 13px; color: #CBD5E1; display: flex; gap: 12px; align-items: center; }
+    header.bar button { background: transparent; border: 1px solid #475569; color: #fff; border-radius: 8px; padding: 5px 12px; cursor: pointer; }
+
+    main { width: min(1180px, 100% - 32px); margin: 24px auto 64px; }
+
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
+
+    /* ---- Inicio de sesión ---- */
+    .login { max-width: 380px; margin: 64px auto; padding: 28px; }
+    .login h1 { margin: 0 0 4px; font-size: 22px; }
+    .login p { margin: 0 0 20px; color: var(--muted); }
+    label { display: block; font-weight: 500; margin: 14px 0 6px; }
+    input[type=search], input[type=email], input[type=password], input[type=text], input[type=tel], input[type=number], select {
+      width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg);
+    }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 9px 16px; border-radius: 8px; border: 1px solid var(--line);
+      background: var(--panel); cursor: pointer; font-weight: 500;
+    }
+    .btn:hover { border-color: var(--muted); }
+    .btn-primary { background: var(--green); border-color: var(--green); color: #fff; }
+    .btn-primary:hover { filter: brightness(1.05); border-color: var(--green); }
+    .btn-danger { color: var(--red); }
+    .btn[disabled] { opacity: .55; cursor: default; }
+    a.btn[aria-disabled="true"] { opacity: .5; pointer-events: none; }
+    a.btn { text-decoration: none; color: inherit; }
+    a.btn.btn-primary { color: #fff; }
+    .full { width: 100%; margin-top: 20px; }
+    .error { color: var(--red); margin-top: 12px; min-height: 1.5em; }
+    .notice { padding: 20px 24px; max-width: 640px; margin: 48px auto; }
+    .notice code { background: var(--gray-bg); padding: 2px 6px; border-radius: 4px; word-break: break-all; }
+
+    /* ---- Resumen ---- */
+    .summary { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 18px; }
+    .summary button {
+      text-align: left; padding: 14px 16px; cursor: pointer;
+      background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+    }
+    .summary button[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+    .summary .n { display: block; font-size: 26px; font-weight: 700; line-height: 1.1; }
+    .summary .l { color: var(--muted); font-size: 13px; }
+
+    .toolbar { display: flex; gap: 10px; margin-bottom: 12px; align-items: center; }
+    .toolbar input { max-width: 340px; }
+    .toolbar .count { color: var(--muted); margin-left: auto; font-size: 13px; }
+
+    /* ---- Tabla de tiendas ---- */
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+    th { font-size: 13px; color: var(--muted); font-weight: 500; }
+    tbody tr { cursor: pointer; }
+    tbody tr:hover { background: var(--bg); }
+    tbody tr:last-child td { border-bottom: 0; }
+    td .sub { display: block; color: var(--muted); font-size: 13px; }
+    .pill {
+      display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap;
+    }
+    .s-activa { background: var(--green-bg); color: var(--green); }
+    .s-por-vencer, .s-gracia { background: var(--amber-bg); color: var(--amber); }
+    .s-suspendida { background: var(--red-bg); color: var(--red); }
+    .s-sin-registro { background: var(--gray-bg); color: var(--ink-soft); }
+    .s-exenta { background: var(--blue-bg); color: var(--blue); }
+    .exempt-box p { margin: 0 0 10px; color: var(--ink-soft); }
+    .btn-blue { background: var(--blue-bg); border-color: var(--blue); color: var(--blue); font-weight: 600; }
+    .empty { padding: 36px; text-align: center; color: var(--muted); }
+
+    /* ---- Detalle de una tienda ---- */
+    dialog {
+      width: min(560px, 100% - 24px); border: 1px solid var(--line); border-radius: 14px;
+      background: var(--panel); color: var(--ink); padding: 0;
+    }
+    dialog::backdrop { background: rgba(15, 23, 42, .5); }
+    .dlg-head { padding: 18px 22px 14px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; }
+    .dlg-head h2 { margin: 0; font-size: 19px; }
+    .dlg-head .sub { color: var(--muted); font-size: 13px; }
+    .dlg-body { padding: 18px 22px; display: grid; gap: 18px; max-height: 70vh; overflow: auto; }
+    .facts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 18px; margin: 0; }
+    .facts dt { color: var(--muted); font-size: 13px; }
+    .facts dd { margin: 0; font-weight: 500; }
+    fieldset { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px 14px; margin: 0; }
+    legend { padding: 0 6px; font-weight: 600; }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }
+    .row > div { flex: 1; min-width: 120px; }
+    .history { list-style: none; margin: 0; padding: 0; font-size: 14px; }
+    .history li { padding: 8px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; }
+    .history li:last-child { border-bottom: 0; }
+    .history .sub { color: var(--muted); font-size: 13px; }
+    .dlg-foot { padding: 14px 22px 18px; border-top: 1px solid var(--line); display: flex; gap: 10px; justify-content: space-between; flex-wrap: wrap; }
+    .x { background: none; border: 0; font-size: 22px; line-height: 1; cursor: pointer; color: var(--muted); padding: 2px 6px; }
+
+    .toast {
+      position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+      background: var(--ink); color: var(--panel); padding: 10px 16px; border-radius: 10px;
+      font-size: 14px; max-width: calc(100% - 32px);
+    }
+
+    @media (max-width: 760px) {
+      header.bar { padding: 10px 16px; }
+      #who-email { display: none; }
+      header.bar button { white-space: nowrap; }
+      .summary { grid-template-columns: 1fr 1fr; }
+      thead { display: none; }
+      table, tbody, tr, td { display: block; width: 100%; }
+      tbody tr { padding: 10px 14px; border-bottom: 1px solid var(--line); }
+      td { border: 0; padding: 2px 0; }
+      td[data-label]::before { content: attr(data-label) ": "; color: var(--muted); font-size: 13px; }
+      .toolbar { flex-wrap: wrap; }
+      .toolbar input { max-width: none; }
+      .facts { grid-template-columns: 1fr; }
+    }
+
+    /* =====================================================================
+       Estilo Aurora (igual que nubiksoft.com)
+       ===================================================================== */
+    html:root {
+      --bg: #05070F; --panel: rgba(255,255,255,.045); --panel-solid: #0D1122; --ink: #EEF2FF; --ink-soft: #AEB8D4;
+      --muted: #8590AE; --line: rgba(255,255,255,.09); --brand: transparent;
+      --green: #34D399; --green-bg: rgba(52,211,153,.14); --amber: #FBBF24; --amber-bg: rgba(251,191,36,.14);
+      --red: #F87171; --red-bg: rgba(248,113,113,.14); --gray-bg: rgba(255,255,255,.07);
+      --blue: #A5B4FC; --blue-bg: rgba(139,155,255,.16); --violet: #C4B5FD; --violet-bg: rgba(139,92,246,.2);
+      --focus: #8B9BFF; --a1: #22D3EE; --a2: #8B5CF6; --a3: #EC4899; --a4: #34D399;
+      color-scheme: dark;
+    }
+    html { background: var(--bg); }
+    body { background: transparent !important; }
+    body { font-size: 15px; -webkit-font-smoothing: antialiased; }
+    .aurora { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; background: var(--bg); }
+    .aurora i { position: absolute; border-radius: 50%; filter: blur(90px); opacity: .42; mix-blend-mode: screen; will-change: transform; }
+    .aurora .b1 { width: 60vw; height: 60vw; left: -15vw; top: -25vw; background: var(--a2); animation: aur1 22s ease-in-out infinite alternate; }
+    .aurora .b2 { width: 50vw; height: 50vw; right: -10vw; top: -10vw; background: var(--a1); animation: aur2 26s ease-in-out infinite alternate; }
+    .aurora .b3 { width: 45vw; height: 45vw; left: 25vw; top: 30vh; background: var(--a3); opacity: .26; animation: aur3 30s ease-in-out infinite alternate; }
+    .aurora .b4 { width: 40vw; height: 40vw; right: 5vw; bottom: -20vw; background: var(--a4); opacity: .22; animation: aur1 34s ease-in-out infinite alternate-reverse; }
+    @keyframes aur1 { to { transform: translate(18vw, 14vh) scale(1.15); } }
+    @keyframes aur2 { to { transform: translate(-16vw, 20vh) scale(.9); } }
+    @keyframes aur3 { to { transform: translate(-12vw, -18vh) scale(1.2); } }
+    .aurora::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 30%, rgba(5,7,15,.75)); }
+    @media (max-width: 640px) { .aurora i { filter: blur(60px); } }
+    @media (prefers-reduced-motion: reduce) { .aurora i { animation: none; } }
+
+    header.bar { position: sticky; top: 0; z-index: 30; flex-wrap: wrap; padding: 12px 24px; background: rgba(5,7,15,.55); backdrop-filter: blur(18px) saturate(160%); -webkit-backdrop-filter: blur(18px) saturate(160%); border-bottom: 1px solid var(--line); }
+    header.bar .id { gap: 12px; font-weight: 700; font-size: 16px; letter-spacing: -.01em; }
+    header.bar .id small { display: block; font-weight: 500; font-size: 12px; color: var(--muted); letter-spacing: 0; }
+    .brand-mark { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; flex: none; background: linear-gradient(135deg, var(--a1), var(--a2) 55%, var(--a3)); box-shadow: 0 0 22px rgba(139,92,246,.5); }
+    .brand-mark svg { width: 16px; height: 16px; }
+    header.bar .who { color: var(--ink-soft); }
+    header.bar button { border-color: rgba(255,255,255,.18); border-radius: 10px; padding: 7px 14px; font-weight: 600; background: rgba(255,255,255,.05); }
+    header.bar button:hover { border-color: rgba(255,255,255,.35); }
+
+    .card, .summary button { background: var(--panel); border-color: var(--line); border-radius: 16px; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+    .summary button { transition: border-color .2s ease, background-color .2s ease; }
+    .summary button:hover { border-color: rgba(255,255,255,.22); }
+    .summary button[aria-pressed="true"] { border-color: rgba(139,155,255,.7); box-shadow: inset 0 0 0 1px rgba(139,155,255,.7), 0 18px 40px -24px rgba(139,92,246,.8); background: rgba(139,155,255,.08); }
+    .summary .n { font-size: 28px; letter-spacing: -.02em; }
+    input[type=search], input[type=email], input[type=password], input[type=text], input[type=tel], input[type=number], select { background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.12); border-radius: 10px; }
+    select option { background: var(--panel-solid); color: var(--ink); }
+    .btn { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.14); border-radius: 10px; font-weight: 600; transition: border-color .2s ease, background-position .4s ease; }
+    .btn:hover { border-color: rgba(255,255,255,.32); }
+    .btn-primary, a.btn.btn-primary { background: linear-gradient(120deg, var(--a1), var(--a2) 55%, var(--a3)); background-size: 180% 100%; border-color: transparent; color: #fff; box-shadow: 0 10px 26px -12px rgba(139,92,246,.9); }
+    .btn-primary:hover { background-position: 100% 0; border-color: transparent; filter: none; }
+    .btn-blue { background: var(--blue-bg); border-color: rgba(165,180,252,.5); }
+    .login { margin-top: 10vh; padding: 32px; }
+    .login h1 { font-size: 26px; letter-spacing: -.02em; }
+    th { color: var(--muted); }
+    tbody tr:hover { background: rgba(255,255,255,.04); }
+    dialog { background: var(--panel-solid); border-color: rgba(255,255,255,.12); border-radius: 18px; box-shadow: 0 40px 100px -30px rgba(0,0,0,.9), 0 0 80px -40px rgba(139,92,246,.6); }
+    dialog::backdrop { background: rgba(3,4,10,.7); backdrop-filter: blur(4px); }
+    fieldset { border-color: var(--line); border-radius: 14px; }
+    .toast { background: #1A1F3A; color: var(--ink); border: 1px solid rgba(255,255,255,.14); box-shadow: 0 20px 50px -20px rgba(0,0,0,.9); z-index: 60; }
+
+    /* Pestañas del panel (en el encabezado) */
+    header.bar .tabs { display: flex; gap: 4px; margin: 0 auto 0 24px; border: 0; padding: 4px; background: rgba(255,255,255,.04); border-radius: 12px; }
+    header.bar .tabs button { border: 0; margin: 0; padding: 7px 14px; border-radius: 9px; color: var(--ink-soft); background: transparent; font-weight: 600; }
+    header.bar .tabs button:hover { color: var(--ink); }
+    header.bar .tabs button[aria-selected="true"] { color: #fff; background: linear-gradient(120deg, rgba(34,211,238,.28), rgba(139,92,246,.38)); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); }
+
+    @media (max-width: 760px) {
+      header.bar { padding: 10px 16px; row-gap: 10px; }
+      header.bar .tabs { order: 3; width: 100%; margin: 0; }
+      header.bar .tabs button { flex: 1; justify-content: center; }
+      header.bar .id small { display: none; }
+      header.bar .id { flex: 1; min-width: 0; }
+      header.bar .who { margin-left: auto; }
+      main { margin-top: 18px; }
+      tbody tr { border-bottom-color: var(--line); }
+    }
+
+    /* =====================================================================
+       Métricas
+       ===================================================================== */
+    .m-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+    .m-head h1 { margin: 0; font-size: 26px; letter-spacing: -.02em; }
+    .m-head .when { color: var(--muted); font-size: 13px; margin-right: 10px; }
+    .m-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }
+    .m-card { grid-column: span 6; padding: 20px 22px; min-width: 0; }
+    .m-card.kpi { grid-column: span 3; padding: 18px 20px; }
+    .m-card h2 { margin: 0; font-size: 16px; font-weight: 700; letter-spacing: -.01em; }
+    .m-card .ch { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 14px; }
+    .m-card .ch span { color: var(--muted); font-size: 13px; white-space: nowrap; }
+    .kpi .l { color: var(--ink-soft); font-size: 13px; }
+    .kpi .v { font-size: 32px; font-weight: 800; letter-spacing: -.03em; line-height: 1.15; margin: 4px 0 6px; font-variant-numeric: tabular-nums; }
+    .kpi .s { color: var(--muted); font-size: 13px; line-height: 1.45; }
+    .up { color: var(--green); } .down { color: var(--red); }
+    .m-note { margin: 10px 0 0; color: var(--muted); font-size: 12.5px; }
+    .chart { position: relative; }
+    .chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+    .chart .gl { stroke: rgba(255,255,255,.07); }
+    .chart .tx { fill: var(--muted); font-size: 11px; font-family: inherit; }
+    .chart .tx.now { fill: var(--ink); font-weight: 700; }
+    .chart .vl { fill: var(--ink); font-size: 11px; font-weight: 700; font-family: inherit; }
+    .chart .bar { transition: opacity .15s ease; }
+    .chart .hit { fill: transparent; cursor: default; }
+    .chart .hit:hover + .bar, .chart g:hover .bar { opacity: .8; }
+    .tip { position: absolute; pointer-events: none; background: #1A1F3A; border: 1px solid rgba(255,255,255,.14); color: var(--ink); font-size: 12.5px; padding: 6px 10px; border-radius: 8px; white-space: nowrap; transform: translate(-50%, -110%); box-shadow: 0 12px 30px -12px rgba(0,0,0,.9); }
+    .st { display: grid; gap: 16px; }
+    .st-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(90px, 1fr) 32px; gap: 14px; align-items: center; }
+    .st-row .d { color: var(--muted); font-size: 13px; margin-top: 4px; }
+    .track { height: 8px; border-radius: 99px; background: rgba(255,255,255,.07); overflow: hidden; }
+    .track i { display: block; height: 100%; border-radius: 99px; }
+    .st-row b { text-align: right; font-size: 16px; font-variant-numeric: tabular-nums; }
+    .t-green { background: var(--green); } .t-violet { background: #8B5CF6; } .t-blue { background: #818CF8; } .t-red { background: var(--red); }
+    .s-pagando { background: var(--green-bg); color: var(--green); }
+    .s-inicial { background: var(--violet-bg); color: var(--violet); }
+    .use { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 20px; margin-bottom: 18px; }
+    .use .l { color: var(--muted); font-size: 13px; }
+    .use .v { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .use .v small { font-size: 13px; font-weight: 500; color: var(--muted); }
+    .badge-amber { display: inline-grid; place-items: center; min-width: 26px; height: 26px; padding: 0 8px; border-radius: 99px; background: var(--amber-bg); color: var(--amber); font-size: 14px; }
+    .m-sub { color: var(--muted); font-size: 13px; margin: 0 0 6px; }
+    .m-list { list-style: none; margin: 0; padding: 0; }
+    .m-list li { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line); }
+    .m-list li:last-child { border-bottom: 0; }
+    .m-list .sub { display: block; color: var(--muted); font-size: 13px; }
+    .m-list button { all: unset; cursor: pointer; display: block; min-width: 0; }
+    .m-list button:hover .nm { text-decoration: underline; text-underline-offset: 3px; }
+    .m-list button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
+    .m-list .amt { font-weight: 700; font-variant-numeric: tabular-nums; }
+    .m-list .amt.late { color: var(--red); }
+    .tag { display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 99px; font-size: 12px; font-weight: 600; background: var(--violet-bg); color: var(--violet); vertical-align: 1px; }
+    .scroll { max-height: 360px; overflow: auto; margin-right: -8px; padding-right: 8px; }
+    .m-empty { color: var(--muted); padding: 18px 0; }
+    @media (max-width: 1000px) {
+      .m-card.kpi { grid-column: span 6; }
+      .m-card { grid-column: span 12; }
+    }
+    @media (max-width: 420px) { header.bar .id .long { display: none; } }
+    @media (max-width: 520px) {
+      .m-grid { gap: 12px; }
+      .st-row { grid-template-columns: minmax(0, 1fr) 70px 24px; gap: 10px; }
+      .m-card.kpi { grid-column: span 12; }
+      .m-card { padding: 18px 16px; }
+      .kpi .v { font-size: 28px; }
+      .use { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="aurora" aria-hidden="true"><i class="b1"></i><i class="b2"></i><i class="b3"></i><i class="b4"></i></div>
+  <header class="bar">
+    <div class="id"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M2.5 14V2h2.4l6.2 8.4V2h2.4v12h-2.4L4.9 5.6V14z" fill="#fff"/></svg></span><span><span class="long">Administración de </span>Zentory<small>NubikSoft</small></span></div>
+    <div class="who" id="who" hidden>
+      <span id="who-email"></span>
+      <button id="logout" type="button">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Inicio de sesión -->
+    <form class="card login" id="login" hidden>
+      <h1>Panel de NubikSoft</h1>
+      <p>Inicia sesión con tu cuenta de administrador.</p>
+      <label for="email">Correo</label>
+      <input id="email" type="email" autocomplete="username" required>
+      <label for="password">Contraseña</label>
+      <input id="password" type="password" autocomplete="current-password" required>
+      <button class="btn btn-primary full" type="submit" id="login-btn">Iniciar sesión</button>
+      <div class="error" id="login-error" role="alert"></div>
+    </form>
+
+    <!-- Cuenta sin permiso -->
+    <div class="card notice" id="not-admin" hidden>
+      <h2 style="margin-top:0">Esta cuenta no es administradora</h2>
+      <p>Para darle acceso, en la consola de Firebase abre <b>Firestore Database</b>, crea la colección <code>nubiksoft_admins</code> y dentro un documento cuyo ID sea:</p>
+      <p><code id="my-uid"></code> <button class="btn" type="button" id="copy-uid">Copiar</button></p>
+      <p>No necesita campos (puedes poner <code>nombre</code> con tu nombre). Luego recarga esta página.</p>
+    </div>
+
+    <!-- Panel -->
+    <div id="panel" hidden>
+      <div class="summary" id="summary" role="group" aria-label="Filtrar por estado"></div>
+      <div class="toolbar">
+        <input type="search" id="search" placeholder="Buscar tienda, administrador o correo" aria-label="Buscar tienda">
+        <button class="btn" type="button" id="reload">Actualizar</button>
+        <span class="count" id="count"></span>
+      </div>
+      <div class="card">
+        <table>
+          <thead>
+            <tr><th>Tienda</th><th>Administrador</th><th>Personal</th><th>Lotes</th><th>Próximo pago</th><th>Estado</th></tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+        <div class="empty" id="empty" hidden></div>
+      </div>
+    </div>
+  </main>
+
+  <dialog id="dlg" aria-labelledby="dlg-title">
+    <div class="dlg-head">
+      <div>
+        <h2 id="dlg-title"></h2>
+        <div class="sub" id="dlg-sub"></div>
+      </div>
+      <button class="x" type="button" data-close aria-label="Cerrar">×</button>
+    </div>
+    <div class="dlg-body">
+      <dl class="facts" id="dlg-facts"></dl>
+
+      <fieldset class="exempt-box">
+        <legend>Uso sin pago</legend>
+        <p id="exempt-text"></p>
+        <button class="btn btn-blue" type="button" id="exempt-btn"></button>
+      </fieldset>
+
+      <fieldset id="pay-box">
+        <legend>Registrar pago</legend>
+        <div class="row">
+          <div>
+            <label for="pay-months">Meses</label>
+            <select id="pay-months">
+              <option value="1">1 mes</option>
+              <option value="3">3 meses</option>
+              <option value="6">6 meses</option>
+              <option value="12">12 meses</option>
+            </select>
+          </div>
+          <div>
+            <label for="pay-amount">Monto (USD)</label>
+            <input id="pay-amount" type="number" min="0" step="0.01" placeholder="Opcional">
+          </div>
+        </div>
+        <label for="pay-note">Nota</label>
+        <input id="pay-note" type="text" placeholder="Ej. Yappy, transferencia, efectivo">
+        <p class="sub" id="pay-preview" style="margin:10px 0 0;color:var(--muted)"></p>
+        <button class="btn btn-primary" type="button" id="pay-btn" style="margin-top:10px">Registrar pago</button>
+      </fieldset>
+
+      <fieldset>
+        <legend>WhatsApp del cliente</legend>
+        <div class="row">
+          <div>
+            <label for="wa">Número con código de país</label>
+            <input id="wa" type="tel" placeholder="Ej. 50761234567">
+          </div>
+          <button class="btn" type="button" id="wa-save">Guardar</button>
+          <a class="btn" id="wa-open" target="_blank" rel="noopener">Abrir chat</a>
+        </div>
+        <a class="btn btn-primary" id="wa-pay" target="_blank" rel="noopener" style="margin-top:10px">Enviar recordatorio de pago</a>
+      </fieldset>
+
+      <div>
+        <strong>Historial de pagos</strong>
+        <ul class="history" id="history"></ul>
+      </div>
+    </div>
+    <div class="dlg-foot">
+      <button class="btn btn-danger" type="button" id="suspend-btn">Suspender tienda</button>
+      <button class="btn" type="button" data-close>Cerrar</button>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" hidden></div>
+
+  <!-- Panel de tiendas y suscripciones (incluye la configuración de Firebase) -->
+  <script type="module">
+    // Panel de administración de Zentory (NubikSoft).
+    // Lee y modifica Firestore directamente; las reglas de seguridad
+    // (firestore.rules) solo permiten cambiar la suscripción a las cuentas que
+    // estén en la colección nubiksoft_admins.
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+    import {
+      getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut,
+    } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+    import {
+      getFirestore, collection, doc, getDoc, getDocs, getCountFromServer, query,
+      orderBy, limit, updateDoc, writeBatch, serverTimestamp, Timestamp, deleteField,
+    } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+    // Configuración de Firebase del panel (proyecto zentory-base, app web "Panel NubikSoft").
+    const firebaseConfig = {
+      apiKey: 'AIzaSyC4Ul2Du4OrpHVrpbecSIMqdkZzskpaMAE',
+      authDomain: 'zentory-base.firebaseapp.com',
+      projectId: 'zentory-base',
+      storageBucket: 'zentory-base.firebasestorage.app',
+      messagingSenderId: '794054120945',
+      appId: '1:794054120945:web:0b24be636e6e7088c8a050',
+      measurementId: 'G-7S1THYLZRK',
+    };
+
+    // Reglas de la suscripción (deben coincidir con la app y firestore.rules).
+    const GRACE_DAYS = 5;
+    const WARNING_DAYS = 5;
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const $ = (id) => document.getElementById(id);
+    const DAY = 24 * 60 * 60 * 1000;
+
+    const STATUS = {
+      'activa': 'Activa',
+      'por-vencer': 'Por vencer',
+      'gracia': 'Vencida (gracia)',
+      'suspendida': 'Suspendida',
+      'sin-registro': 'Sin registro',
+      'exenta': 'Sin pago',
+    };
+
+    const FILTERS = [
+      { id: 'todas', label: 'Todas', match: () => true },
+      { id: 'al-dia', label: 'Al día', match: (s) => s === 'activa' || s === 'sin-registro' },
+      { id: 'por-vencer', label: 'Por vencer o vencidas', match: (s) => s === 'por-vencer' || s === 'gracia' },
+      { id: 'suspendida', label: 'Suspendidas', match: (s) => s === 'suspendida' },
+      { id: 'exenta', label: 'Uso sin pago', match: (s) => s === 'exenta' },
+    ];
+
+    let stores = [];
+    let filter = 'todas';
+    let current = null; // tienda abierta en el detalle
+
+    // ---------------------------------------------------------------------------
+    // Utilidades
+    // ---------------------------------------------------------------------------
+
+    function esc(value) {
+      return String(value ?? '').replace(/[&<>"']/g, (c) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+      }[c]));
+    }
+
+    function fmtDate(date) {
+      if (!date) return '—';
+      return date.toLocaleDateString('es-PA', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    function addMonths(date, months) {
+      const d = new Date(date);
+      const day = d.getDate();
+      d.setMonth(d.getMonth() + months);
+      if (d.getDate() < day) d.setDate(0); // 31 de enero + 1 mes = 28/29 de febrero
+      return d;
+    }
+
+    /**
+     * Mismo cálculo que la app (lib/models/subscription.dart).
+     * 'exenta' es una tienda a la que NubikSoft le dio uso sin pago: no tiene
+     * fecha de pago, así que la app la ve como activa y no muestra avisos.
+     */
+    function statusOf(sub, now = new Date()) {
+      if (!sub) return 'sin-registro';
+      if (sub.estado === 'exenta') return 'exenta';
+      if (sub.estado === 'suspendida') return 'suspendida';
+      const until = sub.pagadoHasta?.toDate?.();
+      if (!until) return 'sin-registro';
+      if (now - until > GRACE_DAYS * DAY) return 'suspendida';
+      if (now > until) return 'gracia';
+      if (until - now <= WARNING_DAYS * DAY) return 'por-vencer';
+      return 'activa';
+    }
+
+    function pill(status) {
+      return `<span class="pill s-${status}">${STATUS[status]}</span>`;
+    }
+
+    let toastTimer;
+    function toast(text) {
+      const el = $('toast');
+      el.textContent = text;
+      el.hidden = false;
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => { el.hidden = true; }, 3500);
+    }
+
+    function friendlyError(e) {
+      const code = e?.code || '';
+      if (code.includes('invalid-credential') || code.includes('wrong-password') || code.includes('user-not-found')) {
+        return 'Correo o contraseña incorrectos.';
+      }
+      if (code.includes('too-many-requests')) return 'Demasiados intentos. Espera unos minutos.';
+      if (code.includes('permission-denied')) {
+        return 'Firebase rechazó la operación. Revisa que las reglas de firestore.rules estén publicadas y que tu cuenta esté en nubiksoft_admins.';
+      }
+      if (code.includes('api-key') || code.includes('referer') || code.includes('unauthorized-domain')) {
+        return 'Firebase no acepta esta página. Registra una app web en Firebase y copia su configuración en firebaseConfig, dentro de zentory/admin/index.html.';
+      }
+      return e?.message || String(e);
+    }
+
+    function show(section) {
+      for (const id of ['login', 'not-admin', 'panel']) $(id).hidden = id !== section;
+    }
+
+    // ---------------------------------------------------------------------------
+    // Sesión
+    // ---------------------------------------------------------------------------
+
+    $('login').addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      $('login-error').textContent = '';
+      $('login-btn').disabled = true;
+      try {
+        await signInWithEmailAndPassword(auth, $('email').value.trim(), $('password').value);
+      } catch (e) {
+        $('login-error').textContent = friendlyError(e);
+      } finally {
+        $('login-btn').disabled = false;
+      }
+    });
+
+    $('logout').addEventListener('click', () => signOut(auth));
+
+    $('copy-uid').addEventListener('click', async () => {
+      await navigator.clipboard.writeText($('my-uid').textContent);
+      toast('ID copiado');
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+      $('who').hidden = !user;
+      if (!user) {
+        show('login');
+        return;
+      }
+      $('who-email').textContent = user.email;
+      let isAdmin = false;
+      try {
+        isAdmin = (await getDoc(doc(db, 'nubiksoft_admins', user.uid))).exists();
+      } catch (e) {
+        isAdmin = false;
+      }
+      if (!isAdmin) {
+        $('my-uid').textContent = user.uid;
+        show('not-admin');
+        return;
+      }
+      show('panel');
+      await loadStores();
+    });
+
+    // ---------------------------------------------------------------------------
+    // Lista de tiendas
+    // ---------------------------------------------------------------------------
+
+    async function loadStore(snap) {
+      const data = snap.data();
+      const [staffSnap, lotsCount] = await Promise.all([
+        getDocs(collection(db, 'tiendas', snap.id, 'personal')).catch(() => null),
+        getCountFromServer(collection(db, 'tiendas', snap.id, 'productos'))
+          .then((r) => r.data().count).catch(() => null),
+      ]);
+      const staff = staffSnap ? staffSnap.docs.map((d) => d.data()) : [];
+      const admin = staff.find((m) => m.uid && m.uid === data.adminUid)
+        || staff.find((m) => m.rol === 'Administrador');
+      return {
+        id: snap.id,
+        nombre: data.nombre || snap.id,
+        ubicacion: data.ubicacion || '',
+        codigo: data.codigoInvitacion || '',
+        adminNombre: data.adminNombre || admin?.nombre || '',
+        adminCorreo: admin?.correo || '',
+        creada: data.fechaCreacion?.toDate?.() || null,
+        personal: staffSnap ? staff.length : null,
+        lotes: lotsCount,
+        sub: data.suscripcion || null,
+        whatsapp: data.contacto?.whatsapp || '',
+      };
+    }
+
+    async function loadStores() {
+      $('rows').innerHTML = '';
+      $('empty').hidden = false;
+      $('empty').textContent = 'Cargando tiendas…';
+      try {
+        const snap = await getDocs(collection(db, 'tiendas'));
+        stores = await Promise.all(snap.docs.map(loadStore));
+        stores.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+        render();
+      } catch (e) {
+        $('empty').textContent = friendlyError(e);
+      }
+    }
+
+    $('reload').addEventListener('click', loadStores);
+    $('search').addEventListener('input', render);
+
+    function render() {
+      const now = new Date();
+      for (const s of stores) s.status = statusOf(s.sub, now);
+
+      $('summary').innerHTML = FILTERS.map((f) => {
+        const n = stores.filter((s) => f.match(s.status)).length;
+        return `<button type="button" data-filter="${f.id}" aria-pressed="${f.id === filter}">
+          <span class="n">${n}</span><span class="l">${f.label}</span></button>`;
+      }).join('');
+
+      const term = $('search').value.trim().toLowerCase();
+      const active = FILTERS.find((f) => f.id === filter);
+      const list = stores.filter((s) => active.match(s.status) && (!term ||
+        [s.nombre, s.adminNombre, s.adminCorreo, s.ubicacion].some((v) => v.toLowerCase().includes(term))));
+
+      $('rows').innerHTML = list.map((s) => `
+        <tr data-id="${esc(s.id)}" tabindex="0">
+          <td><strong>${esc(s.nombre)}</strong><span class="sub">${esc(s.ubicacion)}</span></td>
+          <td data-label="Administrador">${esc(s.adminNombre) || '—'}<span class="sub">${esc(s.adminCorreo)}</span></td>
+          <td data-label="Personal">${s.personal ?? '—'}</td>
+          <td data-label="Lotes">${s.lotes ?? '—'}</td>
+          <td data-label="Próximo pago">${s.status === 'exenta' ? 'Sin cobro' : fmtDate(s.sub?.pagadoHasta?.toDate?.())}</td>
+          <td>${pill(s.status)}</td>
+        </tr>`).join('');
+
+      $('count').textContent = `${list.length} de ${stores.length} tiendas`;
+      window.dispatchEvent(new CustomEvent('zentory:stores', { detail: stores }));
+      $('empty').hidden = list.length > 0;
+      if (!list.length) {
+        $('empty').textContent = stores.length
+          ? 'Ninguna tienda coincide con la búsqueda o el filtro.'
+          : 'Todavía no hay tiendas registradas en Zentory.';
+      }
+    }
+
+    $('summary').addEventListener('click', (ev) => {
+      const btn = ev.target.closest('button[data-filter]');
+      if (!btn) return;
+      filter = btn.dataset.filter;
+      render();
+    });
+
+    function openFromRow(ev) {
+      const row = ev.target.closest('tr[data-id]');
+      if (!row) return;
+      if (ev.type === 'keydown' && ev.key !== 'Enter' && ev.key !== ' ') return;
+      ev.preventDefault();
+      openStore(stores.find((s) => s.id === row.dataset.id));
+    }
+    $('rows').addEventListener('click', openFromRow);
+    $('rows').addEventListener('keydown', openFromRow);
+
+    // ---------------------------------------------------------------------------
+    // Detalle de una tienda
+    // ---------------------------------------------------------------------------
+
+    function nextPaidUntil(store, months) {
+      const until = store.sub?.pagadoHasta?.toDate?.();
+      const base = until && until > new Date() ? until : new Date();
+      return addMonths(base, months);
+    }
+
+    function renderDetail() {
+      const s = current;
+      s.status = statusOf(s.sub);
+      $('dlg-title').textContent = s.nombre;
+      $('dlg-sub').innerHTML = `${esc(s.ubicacion)} ${pill(s.status)}`;
+      $('dlg-facts').innerHTML = `
+        <div><dt>Administrador</dt><dd>${esc(s.adminNombre) || '—'}</dd></div>
+        <div><dt>Correo</dt><dd>${esc(s.adminCorreo) || '—'}</dd></div>
+        <div><dt>Próximo pago</dt><dd>${s.status === 'exenta' ? 'Sin cobro' : fmtDate(s.sub?.pagadoHasta?.toDate?.())}</dd></div>
+        <div><dt>Creada</dt><dd>${fmtDate(s.creada)}</dd></div>
+        <div><dt>Personal</dt><dd>${s.personal ?? '—'}</dd></div>
+        <div><dt>Lotes registrados</dt><dd>${s.lotes ?? '—'}</dd></div>
+        <div><dt>Código de invitación</dt><dd>${esc(s.codigo) || '—'}</dd></div>`;
+
+      const exempt = s.status === 'exenta';
+      $('exempt-text').textContent = exempt
+        ? 'Esta tienda usa Zentory sin pagar: no tiene fecha de pago y la app no le muestra avisos de cobro.'
+        : 'Dale a esta tienda uso de Zentory sin pagar. La app dejará de mostrarle avisos de cobro y nunca quedará suspendida por falta de pago.';
+      $('exempt-btn').textContent = exempt ? 'Quitar uso sin pago' : 'Dar uso sin pago';
+      $('pay-box').hidden = exempt;
+      $('suspend-btn').hidden = exempt;
+
+      const suspended = s.sub?.estado === 'suspendida';
+      $('suspend-btn').textContent = suspended ? 'Reactivar tienda' : 'Suspender tienda';
+      $('suspend-btn').classList.toggle('btn-danger', !suspended);
+      $('wa').value = s.whatsapp;
+      updateWaLink();
+      updatePreview();
+    }
+
+    function updatePreview() {
+      if (!current) return;
+      const months = Number($('pay-months').value);
+      $('pay-preview').textContent =
+        `El próximo pago quedará para el ${fmtDate(nextPaidUntil(current, months))}.`;
+    }
+    $('pay-months').addEventListener('change', updatePreview);
+
+    function updateWaLink() {
+      const phone = $('wa').value.replace(/\D/g, '');
+      const link = $('wa-open');
+      const pay = $('wa-pay');
+      pay.hidden = current?.status === 'exenta';
+      if (!phone) {
+        link.removeAttribute('href');
+        link.setAttribute('aria-disabled', 'true');
+        pay.removeAttribute('href');
+        pay.setAttribute('aria-disabled', 'true');
+        return;
+      }
+      const until = current?.sub?.pagadoHasta?.toDate?.();
+      const text = `Hola, te escribimos de NubikSoft. La suscripción de Zentory de la tienda ${current.nombre}` +
+        (until ? ` tiene su próximo pago el ${fmtDate(until)}.` : '.');
+      link.href = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+      link.removeAttribute('aria-disabled');
+
+      // Recordatorio con el enlace a "Mi cuenta" (el cliente entra con su correo de Zentory y paga ahí).
+      const fee = typeof current?.sub?.monto === 'number' && current.sub.monto > 0 ? current.sub.monto : 25;
+      const payText = `Hola, te escribimos de NubikSoft. La mensualidad de Zentory de la tienda ${current.nombre} es de $${fee}` +
+        (until ? ` y vence el ${fmtDate(until)}.` : '.') +
+        ` Puedes pagarla entrando con tu correo y contraseña de Zentory en: https://nubiksoft.com/zentory/cuenta/`;
+      pay.href = `https://wa.me/${phone}?text=${encodeURIComponent(payText)}`;
+      pay.removeAttribute('aria-disabled');
+    }
+    $('wa').addEventListener('input', updateWaLink);
+
+    async function loadHistory(storeId) {
+      const list = $('history');
+      list.innerHTML = '<li class="sub">Cargando…</li>';
+      try {
+        const snap = await getDocs(query(
+          collection(db, 'tiendas', storeId, 'pagos'), orderBy('fecha', 'desc'), limit(12)));
+        if (snap.empty) {
+          list.innerHTML = '<li class="sub">Todavía no hay pagos registrados.</li>';
+          return;
+        }
+        list.innerHTML = snap.docs.map((d) => {
+          const p = d.data();
+          const meses = p.meses === 1 ? '1 mes' : `${p.meses} meses`;
+          const monto = typeof p.monto === 'number' ? ` · ${p.monto.toFixed(2)} USD` : '';
+          return `<li><div>${meses}${monto}<div class="sub">${esc(p.nota || '')}</div></div>
+            <div class="sub">${fmtDate(p.fecha?.toDate?.())}<br>próximo: ${fmtDate(p.hasta?.toDate?.())}</div></li>`;
+        }).join('');
+      } catch (e) {
+        list.innerHTML = `<li class="sub">${esc(friendlyError(e))}</li>`;
+      }
+    }
+
+    function openStore(store) {
+      if (!store) return;
+      current = store;
+      $('pay-months').value = '1';
+      $('pay-amount').value = '';
+      $('pay-note').value = '';
+      renderDetail();
+      loadHistory(store.id);
+      $('dlg').showModal();
+    }
+
+    // La pestaña Métricas abre el detalle de una tienda con este evento.
+    window.addEventListener('zentory:open-store', (ev) => openStore(stores.find((s) => s.id === ev.detail)));
+    window.addEventListener('zentory:reload-stores', () => loadStores());
+
+    $('dlg').addEventListener('click', (ev) => {
+      if (ev.target.closest('[data-close]') || ev.target === $('dlg')) $('dlg').close();
+    });
+
+    async function refreshCurrent() {
+      const snap = await getDoc(doc(db, 'tiendas', current.id));
+      const fresh = await loadStore(snap);
+      const i = stores.findIndex((s) => s.id === current.id);
+      stores[i] = fresh;
+      current = fresh;
+      renderDetail();
+      render();
+    }
+
+    $('pay-btn').addEventListener('click', async () => {
+      const months = Number($('pay-months').value);
+      const amount = $('pay-amount').value === '' ? null : Number($('pay-amount').value);
+      const until = nextPaidUntil(current, months);
+      const btn = $('pay-btn');
+      btn.disabled = true;
+      try {
+        const storeRef = doc(db, 'tiendas', current.id);
+        const batch = writeBatch(db);
+        batch.update(storeRef, {
+          'suscripcion.estado': 'activa',
+          'suscripcion.pagadoHasta': Timestamp.fromDate(until),
+          'suscripcion.actualizado': serverTimestamp(),
+          'suscripcion.actualizadoPor': auth.currentUser.email,
+        });
+        batch.set(doc(collection(storeRef, 'pagos')), {
+          meses: months,
+          monto: amount,
+          nota: $('pay-note').value.trim(),
+          hasta: Timestamp.fromDate(until),
+          fecha: serverTimestamp(),
+          registradoPor: auth.currentUser.email,
+        });
+        await batch.commit();
+        toast(`Pago registrado. Próximo pago de ${current.nombre}: ${fmtDate(until)}.`);
+        $('pay-amount').value = '';
+        $('pay-note').value = '';
+        await refreshCurrent();
+        loadHistory(current.id);
+      } catch (e) {
+        toast(friendlyError(e));
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    /** Fecha de pago al quitar el uso sin pago: la que tenía antes si sigue vigente, o un mes desde hoy. */
+    function dateAfterExemption(store) {
+      const before = store.sub?.pagadoHastaAnterior?.toDate?.();
+      return before && before > new Date() ? before : addMonths(new Date(), 1);
+    }
+
+    $('exempt-btn').addEventListener('click', async () => {
+      const exempt = current.status === 'exenta';
+      const btn = $('exempt-btn');
+      try {
+        if (!exempt) {
+          if (!confirm(`¿Dar uso sin pago a ${current.nombre}? Podrá usar Zentory sin pagar hasta que se lo quites.`)) return;
+          btn.disabled = true;
+          const before = current.sub?.pagadoHasta;
+          await updateDoc(doc(db, 'tiendas', current.id), {
+            'suscripcion.estado': 'exenta',
+            'suscripcion.pagadoHasta': deleteField(),
+            'suscripcion.pagadoHastaAnterior': before || deleteField(),
+            'suscripcion.actualizado': serverTimestamp(),
+            'suscripcion.actualizadoPor': auth.currentUser.email,
+          });
+          await refreshCurrent();
+          toast(`${current.nombre} ahora usa Zentory sin pago.`);
+        } else {
+          const until = dateAfterExemption(current);
+          if (!confirm(`¿Quitar el uso sin pago a ${current.nombre}? Su próximo pago quedará para el ${fmtDate(until)}.`)) return;
+          btn.disabled = true;
+          await updateDoc(doc(db, 'tiendas', current.id), {
+            'suscripcion.estado': 'activa',
+            'suscripcion.pagadoHasta': Timestamp.fromDate(until),
+            'suscripcion.pagadoHastaAnterior': deleteField(),
+            'suscripcion.actualizado': serverTimestamp(),
+            'suscripcion.actualizadoPor': auth.currentUser.email,
+          });
+          await refreshCurrent();
+          toast(`${current.nombre} vuelve a pagar. Próximo pago: ${fmtDate(until)}.`);
+        }
+      } catch (e) {
+        toast(friendlyError(e));
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    $('suspend-btn').addEventListener('click', async () => {
+      const suspend = current.sub?.estado !== 'suspendida';
+      if (suspend && !confirm(`¿Suspender ${current.nombre}? Su personal podrá ver el inventario, pero no agregar ni editar productos.`)) {
+        return;
+      }
+      try {
+        await updateDoc(doc(db, 'tiendas', current.id), {
+          'suscripcion.estado': suspend ? 'suspendida' : 'activa',
+          'suscripcion.actualizado': serverTimestamp(),
+          'suscripcion.actualizadoPor': auth.currentUser.email,
+        });
+        await refreshCurrent();
+        if (suspend) {
+          toast(`${current.nombre} quedó suspendida.`);
+        } else if (current.status === 'suspendida') {
+          toast('Reactivada, pero su fecha de pago ya venció: registra un pago para que vuelva a funcionar.');
+        } else {
+          toast(`${current.nombre} está activa de nuevo.`);
+        }
+      } catch (e) {
+        toast(friendlyError(e));
+      }
+    });
+
+    $('wa-save').addEventListener('click', async () => {
+      const phone = $('wa').value.replace(/\D/g, '');
+      try {
+        await updateDoc(doc(db, 'tiendas', current.id), { 'contacto.whatsapp': phone });
+        await refreshCurrent();
+        toast('Número guardado.');
+      } catch (e) {
+        toast(friendlyError(e));
+      }
+    });
+  </script>
+
+  <!-- Pestaña "Usuarios": acceso de las cuentas de la app. Va después del panel de tiendas. -->
+  <script type="module">
+    // Usuarios de Zentory (panel de NubikSoft).
+    //
+    // Agrega al panel la pestaña "Usuarios": todas las cuentas registradas en la
+    // app, con su acceso, y las acciones para administrarlo.
+    //
+    //   usuarios/{uid}.aprobado      true solo cuando tiene acceso
+    //   usuarios/{uid}.estadoAcceso  'pendiente' | 'aprobado' | 'rechazado' | 'bloqueado'
+    //
+    // - Esperando: recién registrada; la app le muestra "Espere la confirmación de Zentory".
+    // - Con acceso: puede usar la app (las cuentas antiguas sin estos campos también).
+    // - Rechazada: no entra, pero puede volver a pedir acceso desde la app.
+    // - Bloqueada: no entra ni puede volver a pedir acceso hasta que se le quite el bloqueo.
+    // Los cambios llegan a la app al instante, aunque la persona la tenga abierta.
+    //
+    // Va en zentory/admin/index.html, en un bloque <script type="module"> que se
+    // ejecuta DESPUÉS del bloque del panel de tiendas (que inicia Firebase).
+    import { getApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+    import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+    import {
+      getFirestore, collection, doc, onSnapshot, updateDoc, serverTimestamp,
+    } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+    const auth = getAuth(getApp());
+    const db = getFirestore(getApp());
+
+    const STATES = {
+      pendiente: { label: 'Esperando', cls: 'u-pendiente' },
+      aprobado: { label: 'Con acceso', cls: 'u-aprobado' },
+      rechazado: { label: 'Rechazada', cls: 'u-rechazado' },
+      bloqueado: { label: 'Bloqueada', cls: 'u-bloqueado' },
+    };
+
+    const FILTERS = [
+      { id: 'todos', label: 'Todos' },
+      { id: 'pendiente', label: 'Esperando aprobación' },
+      { id: 'aprobado', label: 'Con acceso' },
+      { id: 'rechazado', label: 'Rechazadas' },
+      { id: 'bloqueado', label: 'Bloqueadas' },
+    ];
+
+    /** Mismo cálculo que la app (lib/models/user_access.dart). */
+    function stateOf(u) {
+      if (u.aprobado !== false) return 'aprobado';
+      if (u.estadoAcceso === 'rechazado') return 'rechazado';
+      if (u.estadoAcceso === 'bloqueado') return 'bloqueado';
+      return 'pendiente';
+    }
+
+    /** Acciones disponibles según el estado: [acción, texto, clase del botón]. */
+    const ACTIONS = {
+      pendiente: [['aprobar', 'Aprobar', 'btn-primary'], ['rechazar', 'Rechazar', ''], ['bloquear', 'Bloquear', 'btn-danger']],
+      aprobado: [['quitar', 'Quitar acceso', ''], ['bloquear', 'Bloquear', 'btn-danger']],
+      rechazado: [['aprobar', 'Aprobar', 'btn-primary'], ['bloquear', 'Bloquear', 'btn-danger']],
+      bloqueado: [['desbloquear', 'Quitar bloqueo', 'btn-blue'], ['aprobar', 'Aprobar', 'btn-primary']],
+    };
+
+    /** Lo que guarda cada acción, el texto de confirmación y el aviso al terminar. */
+    const CHANGES = {
+      aprobar: {
+        data: { aprobado: true, estadoAcceso: 'aprobado' },
+        ask: (n) => `¿Dar acceso a Zentory a ${n}?`,
+        done: (n) => `${n} ya puede usar Zentory.`,
+      },
+      rechazar: {
+        data: { aprobado: false, estadoAcceso: 'rechazado' },
+        ask: (n) => `¿Rechazar la solicitud de ${n}? No podrá usar la app, pero podrá volver a pedir acceso.`,
+        done: (n) => `Solicitud de ${n} rechazada.`,
+      },
+      quitar: {
+        data: { aprobado: false, estadoAcceso: 'rechazado' },
+        ask: (n) => `¿Quitarle el acceso a ${n}? La app se le cerrará al instante. Podrá volver a pedir acceso.`,
+        done: (n) => `${n} ya no tiene acceso.`,
+      },
+      bloquear: {
+        data: { aprobado: false, estadoAcceso: 'bloqueado' },
+        ask: (n) => `¿Bloquear a ${n}? No podrá usar la app ni volver a pedir acceso hasta que le quites el bloqueo.`,
+        done: (n) => `La cuenta de ${n} quedó bloqueada.`,
+      },
+      desbloquear: {
+        data: { aprobado: false, estadoAcceso: 'pendiente' },
+        ask: (n) => `¿Quitar el bloqueo a ${n}? Volverá a "Esperando aprobación" para que decidas si le das acceso.`,
+        done: (n) => `Se quitó el bloqueo a ${n}. Ahora espera tu aprobación.`,
+      },
+    };
+
+    // ---- Estilos (usan los mismos colores del panel) ----
+    const style = document.createElement('style');
+    style.textContent = `
+      .tabs { display: flex; gap: 4px; }
+      .tabs button {
+        background: none; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px;
+        padding: 10px 14px; font-weight: 600; color: var(--muted); cursor: pointer;
+        display: inline-flex; align-items: center; gap: 8px;
+      }
+      .tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--green); }
+      .tabs .badge { background: var(--amber-bg); color: var(--amber); border-radius: 999px; padding: 0 8px; font-size: 12px; font-weight: 700; }
+      .waiting-note {
+        display: flex; align-items: center; gap: 12px; justify-content: space-between; flex-wrap: wrap;
+        padding: 12px 16px; margin-bottom: 18px; background: var(--amber-bg); color: var(--amber);
+        border: 1px solid transparent; border-radius: 12px; font-weight: 500;
+      }
+      .waiting-note .btn { color: var(--amber); border-color: var(--amber); background: transparent; }
+      #users-summary { grid-template-columns: repeat(5, 1fr); }
+      .u-pendiente { background: var(--amber-bg); color: var(--amber); }
+      .u-aprobado { background: var(--green-bg); color: var(--green); }
+      .u-rechazado { background: var(--gray-bg); color: var(--ink-soft); }
+      .u-bloqueado { background: var(--red-bg); color: var(--red); }
+      #users-rows tr { cursor: default; }
+      #users-rows tr:hover { background: transparent; }
+      .actions { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+      .actions .btn { padding: 6px 12px; font-size: 14px; }
+      .you { color: var(--muted); font-size: 13px; }
+      @media (max-width: 760px) {
+        #users-summary { grid-template-columns: 1fr 1fr; }
+        .actions { justify-content: flex-start; margin-top: 8px; }
+        .actions .btn { flex: 1; }
+      }
+    `;
+    document.head.append(style);
+
+    const $ = (id) => document.getElementById(id);
+    const panel = $('panel');
+
+    // ---- Pestañas: "Tiendas" (lo que ya tenía el panel) y "Usuarios" ----
+    const storesView = document.createElement('div');
+    storesView.id = 'stores-view';
+    storesView.append(...panel.childNodes);
+
+    const usersView = document.createElement('div');
+    usersView.id = 'users-view';
+    usersView.hidden = true;
+    usersView.innerHTML = `
+      <div class="summary" id="users-summary" role="group" aria-label="Filtrar usuarios por acceso"></div>
+      <div class="toolbar">
+        <input type="search" id="users-search" placeholder="Buscar nombre, correo o tienda" aria-label="Buscar usuario">
+        <span class="count" id="users-count"></span>
+      </div>
+      <div class="card">
+        <table>
+          <thead>
+            <tr><th>Usuario</th><th>Tienda</th><th>Registro</th><th>Acceso</th><th></th></tr>
+          </thead>
+          <tbody id="users-rows"></tbody>
+        </table>
+        <div class="empty" id="users-empty" hidden></div>
+      </div>
+    `;
+
+    const tabs = document.createElement('div');
+    tabs.className = 'tabs';
+    tabs.setAttribute('role', 'tablist');
+    tabs.hidden = true;
+    tabs.innerHTML = `
+      <button type="button" role="tab" id="tab-stores" aria-selected="true" aria-controls="stores-view">Tiendas</button>
+      <button type="button" role="tab" id="tab-metrics" aria-selected="false" aria-controls="metrics-view">Métricas</button>
+      <button type="button" role="tab" id="tab-users" aria-selected="false" aria-controls="users-view">
+        Usuarios <span class="badge" id="tab-users-badge" hidden></span>
+      </button>
+    `;
+
+    const note = document.createElement('div');
+    note.className = 'waiting-note';
+    note.hidden = true;
+    note.innerHTML = `<span id="waiting-text"></span><button class="btn" type="button" id="waiting-go">Ver usuarios</button>`;
+    storesView.prepend(note);
+
+    const metricsView = document.createElement('div');
+    metricsView.id = 'metrics-view';
+    metricsView.hidden = true;
+
+    panel.append(storesView, usersView, metricsView);
+    document.querySelector('header.bar .id').after(tabs);
+
+    function showTab(which) {
+      const views = { stores: storesView, users: usersView, metrics: metricsView };
+      for (const [name, el] of Object.entries(views)) {
+        el.hidden = name !== which;
+        $('tab-' + name).setAttribute('aria-selected', String(name === which));
+      }
+      window.dispatchEvent(new CustomEvent('zentory:tab', { detail: which }));
+      window.scrollTo({ top: 0 });
+    }
+    $('tab-stores').addEventListener('click', () => showTab('stores'));
+    $('tab-users').addEventListener('click', () => showTab('users'));
+    $('tab-metrics').addEventListener('click', () => showTab('metrics'));
+    $('waiting-go').addEventListener('click', () => {
+      filter = 'pendiente';
+      showTab('users');
+      render();
+    });
+
+    // ---- Datos y dibujo ----
+    let users = [];
+    let filter = 'todos';
+
+    const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => (
+      { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    function fmtDate(ts) {
+      const d = ts?.toDate?.();
+      return d ? d.toLocaleDateString('es-PA', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+    }
+
+    function showToast(text) {
+      const el = $('toast');
+      if (!el) return;
+      el.textContent = text;
+      el.hidden = false;
+      clearTimeout(showToast.t);
+      showToast.t = setTimeout(() => { el.hidden = true; }, 3500);
+    }
+
+    function render() {
+      const counts = { todos: users.length, pendiente: 0, aprobado: 0, rechazado: 0, bloqueado: 0 };
+      for (const u of users) counts[u.state]++;
+
+      // Avisos de cuentas esperando
+      const waiting = counts.pendiente;
+      $('tab-users-badge').hidden = waiting === 0;
+      $('tab-users-badge').textContent = waiting;
+      note.hidden = waiting === 0;
+      $('waiting-text').textContent = waiting === 1
+        ? '1 cuenta espera tu aprobación para usar la app.'
+        : `${waiting} cuentas esperan tu aprobación para usar la app.`;
+
+      $('users-summary').innerHTML = FILTERS.map((f) => `
+        <button type="button" data-filter="${f.id}" aria-pressed="${f.id === filter}">
+          <span class="n">${counts[f.id]}</span><span class="l">${f.label}</span>
+        </button>`).join('');
+
+      const term = $('users-search').value.trim().toLowerCase();
+      const shown = users.filter((u) => (filter === 'todos' || u.state === filter) &&
+        (!term || [u.nombre, u.correo, u.tiendaId].some((v) => String(v ?? '').toLowerCase().includes(term))));
+
+      const me = auth.currentUser?.uid;
+      $('users-rows').innerHTML = shown.map((u) => {
+        const st = STATES[u.state];
+        const isMe = u.id === me;
+        const buttons = isMe
+          ? '<span class="you">Tu cuenta</span>'
+          : ACTIONS[u.state].map(([action, text, cls]) =>
+            `<button class="btn ${cls}" type="button" data-action="${action}" data-uid="${esc(u.id)}">${text}</button>`).join('');
+        return `<tr>
+          <td><b>${esc(u.nombre || 'Sin nombre')}</b><span class="sub">${esc(u.correo)}</span></td>
+          <td data-label="Tienda">${esc(u.tiendaId || '—')}</td>
+          <td data-label="Registro">${fmtDate(u.fechaRegistro)}</td>
+          <td data-label="Acceso"><span class="pill ${st.cls}">${st.label}</span></td>
+          <td><div class="actions">${buttons}</div></td>
+        </tr>`;
+      }).join('');
+
+      $('users-count').textContent = `${shown.length} de ${users.length} usuarios`;
+      const empty = $('users-empty');
+      empty.hidden = shown.length > 0;
+      empty.textContent = users.length === 0 ? 'Todavía no hay usuarios registrados.' : 'Ningún usuario coincide con el filtro.';
+    }
+
+    $('users-summary').addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-filter]');
+      if (!btn) return;
+      filter = btn.dataset.filter;
+      render();
+    });
+    $('users-search').addEventListener('input', render);
+
+    $('users-rows').addEventListener('click', async (e) => {
+      const btn = e.target.closest('button[data-action]');
+      if (!btn) return;
+      const user = users.find((u) => u.id === btn.dataset.uid);
+      const change = CHANGES[btn.dataset.action];
+      if (!user || !change) return;
+      const name = user.nombre || user.correo || 'este usuario';
+      if (!confirm(change.ask(name))) return;
+      btn.disabled = true;
+      const email = auth.currentUser?.email ?? '';
+      const data = {
+        ...change.data,
+        accesoActualizado: serverTimestamp(),
+        accesoActualizadoPor: email,
+      };
+      if (btn.dataset.action === 'aprobar') {
+        data.fechaAprobacion = serverTimestamp();
+        data.aprobadoPor = email;
+      }
+      try {
+        await updateDoc(doc(db, 'usuarios', user.id), data);
+        showToast(change.done(name));
+      } catch (err) {
+        btn.disabled = false;
+        showToast(err?.code?.includes('permission-denied')
+          ? 'Tu cuenta no tiene permiso para cambiar el acceso de usuarios.'
+          : 'No se pudo guardar el cambio. Revisa tu conexión e inténtalo de nuevo.');
+      }
+    });
+
+    // ---- Escucha en vivo solo mientras el panel está visible (cuenta administradora) ----
+    let stop = null;
+    function sync() {
+      const visible = !panel.hidden && auth.currentUser;
+      tabs.hidden = !visible;
+      if (visible && !stop) {
+        stop = onSnapshot(collection(db, 'usuarios'),
+          (snap) => {
+            users = snap.docs.map((d) => {
+              const u = { id: d.id, ...d.data() };
+              u.state = stateOf(u);
+              return u;
+            });
+            // Primero los que esperan; luego los más recientes.
+            const order = { pendiente: 0, rechazado: 1, bloqueado: 2, aprobado: 3 };
+            users.sort((a, b) => order[a.state] - order[b.state] ||
+              (b.fechaRegistro?.toMillis?.() ?? 0) - (a.fechaRegistro?.toMillis?.() ?? 0));
+            render();
+            window.dispatchEvent(new CustomEvent('zentory:users', { detail: users }));
+          },
+          () => {
+            const empty = $('users-empty');
+            empty.hidden = false;
+            empty.textContent = 'No se pudieron cargar los usuarios. Revisa tu conexión.';
+          });
+      } else if (!visible && stop) {
+        stop();
+        stop = null;
+        users = [];
+        showTab('stores');
+      }
+    }
+    new MutationObserver(sync).observe(panel, { attributes: true, attributeFilter: ['hidden'] });
+    onAuthStateChanged(auth, sync);
+    sync();
+  </script>
+  <!-- Pestaña "Métricas": ingresos, tiendas y uso de la app. Va después de la pestaña Usuarios. -->
+  <script type="module">
+    // Métricas de Zentory (panel de NubikSoft).
+    // Usa las tiendas que ya cargó el panel y los usuarios de la pestaña Usuarios
+    // (llegan por los eventos zentory:stores y zentory:users). Además lee, solo al
+    // abrir esta pestaña, el historial de pagos de cada tienda y cuántos lotes
+    // registró en los últimos 30 días.
+    import { getApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+    import {
+      getFirestore, collection, getDocs, getCountFromServer, query, where, Timestamp,
+    } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+    const db = getFirestore(getApp());
+    const $ = (id) => document.getElementById(id);
+    const DAY = 24 * 60 * 60 * 1000;
+    const DEFAULT_FEE = 25;
+
+    const view = $('metrics-view');
+    view.innerHTML = `
+      <div class="m-head">
+        <h1>Métricas</h1>
+        <div><span class="when" id="m-when"></span><button class="btn" type="button" id="m-reload">Actualizar</button></div>
+      </div>
+      <div class="m-grid" id="m-grid"><div class="card m-card" style="grid-column:1/-1"><p class="m-empty">Cargando métricas…</p></div></div>`;
+
+    let stores = [];
+    let users = [];
+    let extra = null;      // Map idTienda -> { pagos: [...], lotes30: número | null }
+    let loading = false;
+    let visible = false;
+
+    const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => (
+      { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const money = (n) => '$' + (Math.round(n * 100) / 100).toLocaleString('en-US', { maximumFractionDigits: 2 });
+    const monthName = (d) => d.toLocaleDateString('es-PA', { month: 'short' }).replace('.', '');
+    const fmtDate = (d) => d ? d.toLocaleDateString('es-PA', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+    const fee = (s) => (typeof s.sub?.monto === 'number' && s.sub.monto > 0 ? s.sub.monto : DEFAULT_FEE);
+    const until = (s) => s.sub?.pagadoHasta?.toDate?.() || null;
+
+    function relDays(d, now) {
+      const days = Math.round((startOfDay(d) - startOfDay(now)) / DAY);
+      if (days === 0) return 'vence hoy';
+      if (days === 1) return 'mañana';
+      if (days > 1) return `en ${days} días`;
+      return days === -1 ? 'venció ayer' : `venció hace ${-days} días`;
+    }
+    function startOfDay(d) { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; }
+
+    /** Pagando, período inicial (nunca ha pagado), uso sin pago o suspendida. */
+    function groupOf(s) {
+      if (s.status === 'exenta') return 'exenta';
+      if (s.status === 'suspendida') return 'suspendida';
+      return extra?.get(s.id)?.pagos.length ? 'pagando' : 'inicial';
+    }
+    const GROUPS = {
+      pagando: { label: 'Pagando', desc: 'Funcionan y ya han pagado', pill: 's-pagando', bar: 't-green' },
+      inicial: { label: 'Período inicial', desc: 'Todavía no han hecho su primer pago', pill: 's-inicial', bar: 't-violet' },
+      exenta: { label: 'Uso sin pago', desc: 'Les diste Zentory sin cobro', pill: 's-exenta', bar: 't-blue' },
+      suspendida: { label: 'Suspendidas', desc: 'Por falta de pago o a mano', pill: 's-suspendida', bar: 't-red' },
+    };
+
+    // ---- Datos que solo necesita esta pestaña ----
+    async function loadExtra() {
+      if (loading || !stores.length) return;
+      loading = true;
+      $('m-when').textContent = 'Cargando…';
+      const since = Timestamp.fromDate(new Date(Date.now() - 30 * DAY));
+      const entries = await Promise.all(stores.map(async (s) => {
+        const [pagos, lotes30] = await Promise.all([
+          getDocs(collection(db, 'tiendas', s.id, 'pagos'))
+            .then((snap) => snap.docs.map((d) => d.data())).catch(() => []),
+          getCountFromServer(query(collection(db, 'tiendas', s.id, 'productos'), where('fechaRegistro', '>=', since)))
+            .then((r) => r.data().count).catch(() => null),
+        ]);
+        return [s.id, { pagos, lotes30 }];
+      }));
+      extra = new Map(entries);
+      loading = false;
+      $('m-when').textContent = 'Actualizado ' + new Date().toLocaleTimeString('es-PA', { hour: 'numeric', minute: '2-digit' });
+      render();
+    }
+
+    // ---- Gráfica de barras (SVG) ----
+    function niceMax(v) {
+      if (v <= 4) return 4;
+      const pow = 10 ** Math.floor(Math.log10(v));
+      for (const m of [1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10]) if (m * pow >= v) return m * pow;
+      return 10 * pow;
+    }
+    // El ancho del dibujo sigue al de la tarjeta para que los textos no se vean diminutos en el teléfono.
+    function chartWidth() {
+      const w = view.clientWidth || 1180;
+      const card = w > 1000 ? (w - 16) / 2 : w;
+      return Math.round(Math.max(300, Math.min(560, card - 44)));
+    }
+    let lastW = 0, resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => { if (visible && extra && Math.abs(chartWidth() - lastW) > 20) render(); }, 150);
+    });
+    function barChart(values, labels, fmt, tipFmt) {
+      const W = chartWidth(), H = W < 420 ? 190 : 210, L = 44, R = 8, T = 22, B = 26;
+      const max = niceMax(Math.max(...values, 0));
+      const iw = W - L - R, ih = H - T - B, n = values.length, step = iw / n, bw = Math.min(28, step * 0.62);
+      const y = (v) => T + ih - (v / max) * ih;
+      let g = '';
+      for (let i = 0; i <= 4; i++) {
+        const v = (max / 4) * i, yy = y(v);
+        g += `<line class="gl" x1="${L}" x2="${W - R}" y1="${yy}" y2="${yy}"/><text class="tx" x="${L - 8}" y="${yy + 4}" text-anchor="end">${fmt(v)}</text>`;
+      }
+      values.forEach((v, i) => {
+        const cx = L + step * i + step / 2, last = i === n - 1;
+        const h = Math.max(0, (v / max) * ih), top = T + ih - h, r = Math.min(4, h / 2, bw / 2);
+        const path = h > 0
+          ? `M${cx - bw / 2},${T + ih} V${top + r} Q${cx - bw / 2},${top} ${cx - bw / 2 + r},${top} H${cx + bw / 2 - r} Q${cx + bw / 2},${top} ${cx + bw / 2},${top + r} V${T + ih} Z`
+          : '';
+        g += `<g data-tip="${esc(tipFmt(v, i))}" data-x="${cx}" data-y="${top}">
+          <rect class="hit" x="${L + step * i}" y="${T}" width="${step}" height="${ih + B}"/>
+          ${path ? `<path class="bar" d="${path}" fill="url(#mg)"/>` : ''}
+          ${last && v > 0 ? `<text class="vl" x="${cx}" y="${top - 7}" text-anchor="middle">${fmt(v)}</text>` : ''}
+          ${step >= 30 || (n - 1 - i) % 2 === 0 ? `<text class="tx${last ? ' now' : ''}" x="${cx}" y="${H - 6}" text-anchor="middle">${labels[i]}</text>` : ''}</g>`;
+      });
+      return `<div class="chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(labels.map((l, i) => `${l}: ${fmt(values[i])}`).join(', '))}">
+        <defs><linearGradient id="mg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22D3EE"/><stop offset="1" stop-color="#8B5CF6"/></linearGradient></defs>${g}</svg><div class="tip" hidden></div></div>`;
+    }
+    // Información al pasar el mouse (o tocar) cada mes
+    view.addEventListener('pointerover', (e) => {
+      const g = e.target.closest('g[data-tip]');
+      const chart = e.target.closest('.chart');
+      if (!chart) return;
+      const tip = chart.querySelector('.tip');
+      if (!g) { tip.hidden = true; return; }
+      const svg = chart.querySelector('svg');
+      const k = svg.getBoundingClientRect().width / svg.viewBox.baseVal.width;
+      tip.textContent = g.dataset.tip;
+      tip.style.left = Number(g.dataset.x) * k + 'px';
+      tip.style.top = Math.max(0, Number(g.dataset.y) * k - 6) + 'px';
+      tip.hidden = false;
+    });
+    view.addEventListener('pointerout', (e) => {
+      const chart = e.target.closest('.chart');
+      if (chart && !chart.contains(e.relatedTarget)) chart.querySelector('.tip').hidden = true;
+    });
+
+    // ---- Dibujo ----
+    function render() {
+      if (!visible) return;
+      if (!extra) { if (stores.length) loadExtra(); return; }
+      lastW = chartWidth();
+      const now = new Date();
+      const in30 = new Date(now.getTime() + 30 * DAY);
+      const ago30 = new Date(now.getTime() - 30 * DAY);
+      for (const s of stores) s.group = groupOf(s);
+
+      // Meses (12, terminando en el actual)
+      const months = [];
+      for (let i = 11; i >= 0; i--) months.push(new Date(now.getFullYear(), now.getMonth() - i, 1));
+      const key = (d) => d.getFullYear() * 12 + d.getMonth();
+      const idx = new Map(months.map((m, i) => [key(m), i]));
+
+      const income = months.map(() => 0);
+      for (const s of stores) {
+        for (const p of extra.get(s.id)?.pagos || []) {
+          const d = p.fecha?.toDate?.();
+          if (!d || !idx.has(key(d))) continue;
+          income[idx.get(key(d))] += typeof p.monto === 'number' ? p.monto : fee(s) * (p.meses || 1);
+        }
+      }
+      const newStores = months.map(() => 0);
+      for (const s of stores) if (s.creada && idx.has(key(s.creada))) newStores[idx.get(key(s.creada))]++;
+
+      const paying = stores.filter((s) => s.group === 'pagando');
+      const initial = stores.filter((s) => s.group === 'inicial');
+      const mrr = paying.reduce((a, s) => a + fee(s), 0);
+      const mrrSoon = initial.reduce((a, s) => a + fee(s), 0);
+      const thisMonth = income[11], lastMonth = income[10];
+      const change = lastMonth > 0 ? Math.round(((thisMonth - lastMonth) / lastMonth) * 100) : null;
+
+      const due = stores.filter((s) => s.group !== 'exenta' && until(s) && until(s) <= in30)
+        .sort((a, b) => until(a) - until(b));
+      const dueTotal = due.reduce((a, s) => a + fee(s), 0);
+
+      const createdThisMonth = newStores[11];
+      const lots30 = (s) => extra.get(s.id)?.lotes30;
+      const active30 = stores.filter((s) => (lots30(s) ?? 0) > 0).length;
+      const idle = stores.filter((s) => lots30(s) === 0)
+        .sort((a, b) => (a.lotes ?? 0) - (b.lotes ?? 0));
+
+      const totalLots = stores.reduce((a, s) => a + (s.lotes ?? 0), 0);
+      const lotsMonth = stores.reduce((a, s) => a + (lots30(s) ?? 0), 0);
+      const staff = stores.reduce((a, s) => a + (s.personal ?? 0), 0);
+      const avg = stores.length ? Math.round(totalLots / stores.length) : 0;
+      const usersNew = users.filter((u) => (u.fechaRegistro?.toDate?.() ?? 0) >= ago30).length;
+      const waiting = users.filter((u) => u.state === 'pendiente').length;
+      const refused = users.filter((u) => u.state === 'rechazado' || u.state === 'bloqueado').length;
+      const top = [...stores].filter((s) => s.lotes).sort((a, b) => b.lotes - a.lotes).slice(0, 5);
+      const monthLabel = now.toLocaleDateString('es-PA', { month: 'long' });
+
+      const counts = Object.fromEntries(Object.keys(GROUPS).map((g) => [g, stores.filter((s) => s.group === g).length]));
+      const maxCount = Math.max(1, stores.length);
+
+      const changeTxt = change === null
+        ? (lastMonth === 0 && thisMonth > 0 ? '<span class="up">▲ Primer mes con cobros</span>' : 'Sin cobros el mes pasado')
+        : `<span class="${change >= 0 ? 'up' : 'down'}">${change >= 0 ? '▲' : '▼'} ${Math.abs(change)}% vs. mes pasado (${money(lastMonth)})</span>`;
+
+      const storeBtn = (s, sub) => `<button type="button" data-store="${esc(s.id)}"><span class="nm">${esc(s.nombre)}</span>${sub}</button>`;
+
+      $('m-grid').innerHTML = `
+        <div class="card m-card kpi"><div class="l">Ingreso mensual recurrente</div><div class="v">${money(mrr)}</div>
+          <div class="s">${paying.length} ${paying.length === 1 ? 'tienda pagando' : 'tiendas pagando'}${mrrSoon ? ` · +${money(mrrSoon)} cuando paguen las de período inicial` : ''}</div></div>
+        <div class="card m-card kpi"><div class="l">Cobrado en ${monthLabel}</div><div class="v">${money(thisMonth)}</div><div class="s">${changeTxt}</div></div>
+        <div class="card m-card kpi"><div class="l">Por cobrar en 30 días</div><div class="v">${money(dueTotal)}</div>
+          <div class="s">${due.length} ${due.length === 1 ? 'tienda' : 'tiendas'} con pago próximo o vencido</div></div>
+        <div class="card m-card kpi"><div class="l">Tiendas</div><div class="v">${stores.length}</div>
+          <div class="s">+${createdThisMonth} este mes · ${active30} con actividad en 30 días</div></div>
+
+        <div class="card m-card"><div class="ch"><h2>Ingresos por mes</h2><span>${money(income.reduce((a, b) => a + b, 0))} en 12 meses</span></div>
+          ${barChart(income, months.map(monthName), (v) => money(v), (v, i) => `${months[i].toLocaleDateString('es-PA', { month: 'long', year: 'numeric' })}: ${money(v)}`)}
+          <p class="m-note">Los pagos registrados sin monto se cuentan con la mensualidad de la tienda.</p></div>
+        <div class="card m-card"><div class="ch"><h2>Tiendas nuevas por mes</h2><span>${newStores.reduce((a, b) => a + b, 0)} en 12 meses</span></div>
+          ${barChart(newStores, months.map(monthName), (v) => String(Math.round(v * 10) / 10), (v, i) => `${months[i].toLocaleDateString('es-PA', { month: 'long', year: 'numeric' })}: ${v} ${v === 1 ? 'tienda' : 'tiendas'}`)}</div>
+
+        <div class="card m-card"><div class="ch"><h2>Estado de las tiendas</h2></div>
+          <div class="st">${Object.entries(GROUPS).map(([g, info]) => `
+            <div class="st-row"><div><span class="pill ${info.pill}">${info.label}</span><div class="d">${info.desc}</div></div>
+              <div class="track"><i class="${info.bar}" style="width:${(counts[g] / maxCount) * 100}%"></i></div><b>${counts[g]}</b></div>`).join('')}
+          </div></div>
+        <div class="card m-card"><div class="ch"><h2>Uso de la app</h2></div>
+          <div class="use">
+            <div><div class="l">Lotes en inventario</div><div class="v">${totalLots.toLocaleString('es-PA')}</div></div>
+            <div><div class="l">Lotes nuevos en 30 días</div><div class="v">${lotsMonth.toLocaleString('es-PA')}</div></div>
+            <div><div class="l">Personal en tiendas</div><div class="v">${staff}</div></div>
+            <div><div class="l">Promedio de lotes por tienda</div><div class="v">${avg}</div></div>
+            <div><div class="l">Cuentas de usuario</div><div class="v">${users.length} <small>· +${usersNew} en 30 días</small></div></div>
+            <div><div class="l">Cuentas por aprobar</div><div class="v"><span class="badge-amber">${waiting}</span> <small>· ${refused} rechazadas o bloqueadas</small></div></div>
+          </div>
+          <p class="m-sub">Tiendas con más lotes</p>
+          ${top.length ? `<ul class="m-list">${top.map((s) => `<li>${storeBtn(s, '')}<span class="sub">${s.lotes} lotes</span></li>`).join('')}</ul>` : '<p class="m-empty">Todavía no hay lotes registrados.</p>'}</div>
+
+        <div class="card m-card"><div class="ch"><h2>Próximos cobros</h2><span>próximos 30 días y vencidos</span></div>
+          ${due.length ? `<ul class="m-list scroll">${due.map((s) => {
+            const d = until(s), late = d < now;
+            const first = s.group === 'inicial' ? '<span class="tag">primer pago</span>' : '';
+            return `<li>${storeBtn(s, `${first}<span class="sub">${fmtDate(d)} · ${relDays(d, now)}</span>`)}<span class="amt${late ? ' late' : ''}">${money(fee(s))}</span></li>`;
+          }).join('')}</ul>` : '<p class="m-empty">No hay cobros en los próximos 30 días.</p>'}</div>
+        <div class="card m-card"><div class="ch"><h2>Sin actividad en 30 días</h2><span>${idle.length}</span></div>
+          <p class="m-sub">Tiendas que no han registrado lotes: conviene escribirles antes de que dejen de pagar.</p>
+          ${idle.length ? `<ul class="m-list scroll">${idle.map((s) => `<li>${storeBtn(s, `<span class="sub">${s.lotes ? `${s.lotes} lotes en total` : 'Sin lotes guardados'} · creada ${fmtDate(s.creada)}</span>`)}<span class="pill ${GROUPS[s.group].pill}">${GROUPS[s.group].label}</span></li>`).join('')}</ul>` : '<p class="m-empty">Todas las tiendas registraron lotes este mes.</p>'}</div>
+      `;
+    }
+
+    // Abrir el detalle de una tienda desde las listas
+    view.addEventListener('click', (e) => {
+      const b = e.target.closest('button[data-store]');
+      if (b) window.dispatchEvent(new CustomEvent('zentory:open-store', { detail: b.dataset.store }));
+    });
+    // Al cerrar el detalle (puede que se registrara un pago), se vuelven a leer los pagos.
+    $('dlg').addEventListener('close', () => { if (visible) { extra = null; render(); } });
+
+    $('m-reload').addEventListener('click', () => {
+      extra = null;
+      $('m-when').textContent = 'Cargando…';
+      window.dispatchEvent(new Event('zentory:reload-stores'));
+    });
+
+    window.addEventListener('zentory:stores', (e) => { stores = e.detail; render(); });
+    window.addEventListener('zentory:users', (e) => { users = e.detail; render(); });
+    window.addEventListener('zentory:tab', (e) => { visible = e.detail === 'metrics'; render(); });
+  </script>
+</body>
+</html>
