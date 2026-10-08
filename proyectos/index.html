@@ -22,7 +22,7 @@
 
     * { box-sizing: border-box; }
     html { -webkit-text-size-adjust: 100%; }
-    body { margin: 0; overflow-x: clip; background: var(--page); color: var(--ink); font-family: "Schibsted Grotesk", system-ui, sans-serif; font-size: 1.0625rem; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    body { margin: 0; overflow-x: hidden; overflow-x: clip; background: var(--page); color: var(--ink); font-family: "Schibsted Grotesk", system-ui, sans-serif; font-size: 1.0625rem; line-height: 1.6; -webkit-font-smoothing: antialiased; }
     a { color: inherit; }
     :focus-visible { outline: 3px solid var(--cobalt); outline-offset: 3px; border-radius: 6px; }
     .wrap { width: min(1160px, 100% - 32px); margin-inline: auto; }
@@ -246,6 +246,8 @@
     /* Encabezado con escena 3D */
     .intro { display: grid; grid-template-columns: 1.2fr .8fr; gap: 40px; align-items: center; padding-block: 64px 48px; }
     .intro h1 { background: linear-gradient(100deg, #FFFFFF 30%, #C7D2FE 60%, #F5D0FE); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    /* overflow: hidden recorta la escena girada: antes la página quedaba más ancha que la pantalla en tablets y teléfonos horizontales */
+    .intro { overflow: hidden; }
     .scene { position: relative; height: 260px; perspective: 1200px; }
     .scene .stage { position: absolute; inset: 0; transform-style: preserve-3d; transform: rotateX(var(--rx, 10deg)) rotateY(var(--ry, -18deg)); transition: transform .4s cubic-bezier(.2,.7,.2,1); }
     .tile { position: absolute; width: 120px; height: 120px; border-radius: 30px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.14); box-shadow: 0 40px 70px -30px rgba(0,0,0,.9), 0 0 50px -16px var(--glow); animation: bob 6s ease-in-out infinite; }
@@ -267,7 +269,7 @@
 
     /* Pestañas de vidrio */
     .tabs-bar { background: rgba(5,7,15,.5); backdrop-filter: blur(18px) saturate(160%); -webkit-backdrop-filter: blur(18px) saturate(160%); }
-    .tab { background: rgba(255,255,255,.04); backdrop-filter: blur(10px); }
+    .tab { background: rgba(255,255,255,.04); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
     .tab[data-app="zentory"][aria-selected="true"] { background: linear-gradient(135deg, rgba(16,185,129,.35), rgba(15,23,42,.9)); border-color: rgba(16,185,129,.5); box-shadow: 0 10px 30px -12px rgba(16,185,129,.7); }
     .tab[data-app="monchi"][aria-selected="true"] { background: linear-gradient(135deg, rgba(255,200,0,.3), rgba(19,27,46,.9)); border-color: rgba(255,200,0,.5); box-shadow: 0 10px 30px -12px rgba(255,200,0,.6); }
 
@@ -325,6 +327,29 @@
     @media (max-width: 560px) { .actions { flex-direction: column; align-items: stretch; } .actions .btn { width: 100%; text-align: center; } }
     /* El menú siempre por encima de la escena 3D */
     .top-bar { position: relative; z-index: 60; }
+  
+    /* =====================================================================
+       Rendimiento en teléfonos, tablets y equipos modestos
+       - La aurora usa degradados en lugar de blur(90px) + mix-blend-mode,
+         que obligaban a la tarjeta gráfica a redibujar media pantalla en
+         cada cuadro (tirones al hacer scroll, calentamiento, batería).
+       - En pantallas táctiles o pequeñas se quita el desenfoque de las
+         tarjetas (sobre un fondo liso se ve igual) y se detiene la aurora.
+       ===================================================================== */
+    .aurora i { filter: none !important; mix-blend-mode: normal !important; will-change: auto; }
+    .aurora .b1 { background: radial-gradient(circle closest-side, var(--a2), var(--a2) 22%, transparent) !important; }
+    .aurora .b2 { background: radial-gradient(circle closest-side, var(--a1), var(--a1) 22%, transparent) !important; }
+    .aurora .b3 { background: radial-gradient(circle closest-side, var(--a3), var(--a3) 22%, transparent) !important; }
+    .aurora .b4 { background: radial-gradient(circle closest-side, var(--a4), var(--a4) 22%, transparent) !important; }
+    @media (hover: none), (max-width: 980px) {
+      .mv article, .services article, .contact, .btn-ghost, .tab, .plans > div, .card, .summary button {
+        backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+      }
+      .services article:hover, .project:hover { transform: none; }
+    }
+    @media (max-width: 640px) {
+      .aurora i { animation: none !important; }
+    }
   </style>
   <script>document.documentElement.classList.add('js');</script>
 </head>
