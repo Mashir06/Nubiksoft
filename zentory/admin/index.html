@@ -318,6 +318,29 @@
       .kpi .v { font-size: 28px; }
       .use { grid-template-columns: 1fr 1fr; }
     }
+  
+    /* =====================================================================
+       Rendimiento en teléfonos, tablets y equipos modestos
+       - La aurora usa degradados en lugar de blur(90px) + mix-blend-mode,
+         que obligaban a la tarjeta gráfica a redibujar media pantalla en
+         cada cuadro (tirones al hacer scroll, calentamiento, batería).
+       - En pantallas táctiles o pequeñas se quita el desenfoque de las
+         tarjetas (sobre un fondo liso se ve igual) y se detiene la aurora.
+       ===================================================================== */
+    .aurora i { filter: none !important; mix-blend-mode: normal !important; will-change: auto; }
+    .aurora .b1 { background: radial-gradient(circle closest-side, var(--a2), var(--a2) 22%, transparent) !important; }
+    .aurora .b2 { background: radial-gradient(circle closest-side, var(--a1), var(--a1) 22%, transparent) !important; }
+    .aurora .b3 { background: radial-gradient(circle closest-side, var(--a3), var(--a3) 22%, transparent) !important; }
+    .aurora .b4 { background: radial-gradient(circle closest-side, var(--a4), var(--a4) 22%, transparent) !important; }
+    @media (hover: none), (max-width: 980px) {
+      .mv article, .services article, .contact, .btn-ghost, .tab, .plans > div, .card, .summary button {
+        backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+      }
+      .services article:hover, .project:hover { transform: none; }
+    }
+    @media (max-width: 640px) {
+      .aurora i { animation: none !important; }
+    }
   </style>
 </head>
 <body>
